@@ -81,6 +81,7 @@ Start here:
 - [Architecture](docs/architecture.md)
 - [REST API Contract](docs/rest-api-contract.md)
 - [API Endpoint Matrix](docs/api-endpoint-matrix.md)
+- [Local Development](docs/local-development.md)
 - [Data Model Draft](docs/data-model.md)
 - [Frontend Standards](docs/frontend-standards.md)
 - [Roadmap](docs/roadmap.md)
