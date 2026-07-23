@@ -53,7 +53,6 @@ opensignflow/
   docs/
   docker-compose.yml
   turbo.json
-  pnpm-workspace.yaml
   package.json
 ```
 
@@ -95,15 +94,16 @@ The backend is responsible for:
 
 ### `packages/shared`
 
-Shared code should be limited to stable cross-application contracts:
+Shared code must be limited to small framework-agnostic primitives:
 
-- enums;
-- shared constants;
-- shared Zod schemas where appropriate;
-- non-sensitive utility types;
-- plan names and public feature flags.
+- generic API envelope types;
+- pagination/error types;
+- stable public ID prefixes;
+- small constants that are not domain-resource duplicates.
 
-Do not place backend services, database access, secrets, or provider-specific code here.
+Do not place NestJS DTOs, NestJS entities, Prisma types, domain resource types, manually duplicated domain enums, backend services, database access, secrets, storage providers, or AI provider logic here.
+
+Backend DTO/entity/type ownership is documented in [Backend Standards](./backend-standards.md).
 
 ### `packages/api-client`
 

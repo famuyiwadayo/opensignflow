@@ -143,12 +143,14 @@ apps/web/src/lib/api
 
 Avoid raw `fetch` calls directly inside UI components.
 
+The long-term source of frontend API types should be a generated OpenAPI client, not manually duplicated resource types in the frontend or shared package.
+
 Recommended API call flow:
 
 ```txt
 UI component
   -> feature hook using TanStack Query
-    -> typed API client
+    -> generated or typed API client
       -> REST API
 ```
 

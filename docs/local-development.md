@@ -3,21 +3,28 @@
 ## Prerequisites
 
 - Node.js 20+
-- Corepack enabled
+- Bun 1.2+
 - Docker Desktop or Docker Engine
 
-Enable pnpm through Corepack:
+Install Bun:
 
 ```bash
-corepack enable
-corepack prepare pnpm@9.15.9 --activate
+curl -fsSL https://bun.sh/install | bash
+```
+
+Then confirm:
+
+```bash
+bun --version
 ```
 
 ## Install dependencies
 
 ```bash
-pnpm install
+bun install
 ```
+
+This project uses Bun workspaces plus Turborepo. The first install will generate `bun.lock`.
 
 ## Start local infrastructure
 
@@ -59,8 +66,8 @@ cp apps/web/.env.example apps/web/.env.local
 After installing dependencies and starting Postgres:
 
 ```bash
-pnpm db:generate
-pnpm db:migrate
+bun run db:generate
+bun run db:migrate
 ```
 
 ## Run apps
@@ -68,22 +75,28 @@ pnpm db:migrate
 Run everything through Turborepo:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 Or run one app:
 
 ```bash
-pnpm --filter @opensignflow/api dev
-pnpm --filter @opensignflow/web dev
+bun --filter @opensignflow/api run dev
+bun --filter @opensignflow/web run dev
 ```
 
 ## Useful scripts
 
 ```bash
-pnpm build
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm format
+bun run build
+bun run lint
+bun run typecheck
+bun run test
+bun run format
 ```
+
+## Notes
+
+- `package.json` is the workspace source of truth via the `workspaces` field.
+- We intentionally do not keep `pnpm-workspace.yaml` or `pnpm-lock.yaml`.
+- Commit `bun.lock` after running `bun install` locally.

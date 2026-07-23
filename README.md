@@ -38,7 +38,7 @@ The first version should support:
 
 | Area | Decision |
 |---|---|
-| Monorepo | Turborepo + pnpm workspaces |
+| Monorepo | Turborepo + Bun workspaces |
 | Frontend | Next.js, TypeScript, Tailwind CSS, shadcn/ui |
 | Frontend state/forms | TanStack Query, TanStack Form, TanStack Table, TanStack Virtual where useful |
 | Backend | NestJS, TypeScript |
@@ -57,7 +57,7 @@ opensignflow/
     web/              # Next.js frontend
     api/              # NestJS backend API
   packages/
-    shared/           # shared enums, types, constants, schemas
+    shared/           # generic API primitives, ID prefixes, constants
     database/         # optional Prisma/database package after MVP stabilizes
     api-client/       # generated or hand-written typed API client
     config/           # shared TypeScript/ESLint/Prettier config
@@ -69,7 +69,6 @@ opensignflow/
     roadmap.md
   docker-compose.yml
   turbo.json
-  pnpm-workspace.yaml
   package.json
   README.md
 ```
@@ -83,11 +82,14 @@ Start here:
 - [API Endpoint Matrix](docs/api-endpoint-matrix.md)
 - [Local Development](docs/local-development.md)
 - [Data Model Draft](docs/data-model.md)
+- [Backend Standards](docs/backend-standards.md)
 - [Frontend Standards](docs/frontend-standards.md)
 - [Roadmap](docs/roadmap.md)
 - [ADR 0001: Turborepo with separated frontend and backend](docs/adr/0001-use-turborepo-separated-web-api.md)
 - [ADR 0002: Standardized REST contract](docs/adr/0002-standardize-rest-contract.md)
 - [ADR 0003: camelCase JSON and resource IDs](docs/adr/0003-use-camelcase-json-and-resource-id.md)
+- [ADR 0004: Bun workspaces](docs/adr/0004-use-bun-workspaces.md)
+- [ADR 0005: Backend contract and type ownership](docs/adr/0005-backend-contract-and-type-ownership.md)
 
 ## Product positioning
 

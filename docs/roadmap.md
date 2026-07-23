@@ -36,7 +36,7 @@ Success criteria:
 
 Deliverables:
 
-- Turborepo + pnpm workspace;
+- Turborepo + Bun workspace;
 - `apps/web` Next.js app;
 - `apps/api` NestJS app;
 - `packages/shared` package;
@@ -49,8 +49,8 @@ Deliverables:
 Success criteria:
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
 starts the app stack locally.
