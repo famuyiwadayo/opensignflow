@@ -1,23 +1,9 @@
 import { randomBytes } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
+import { IdPrefix } from '@opensignflow/shared';
 
-export type PublicIdPrefix =
-  | 'usr'
-  | 'org'
-  | 'mem'
-  | 'ses'
-  | 'doc'
-  | 'fld'
-  | 'rcp'
-  | 'sreq'
-  | 'ssub'
-  | 'aud'
-  | 'ai'
-  | 'job'
-  | 'subsc'
-  | 'usg'
-  | 'idem';
+export type PublicIdPrefix = IdPrefix;
 
 @Injectable()
 export class IdGeneratorService {
