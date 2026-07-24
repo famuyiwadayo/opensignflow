@@ -8,6 +8,10 @@ import { validateEnv } from './config/validate-env';
 import { OrganizationsModule } from './organizations';
 import { IdModule, RequestIdMiddleware } from './common';
 import { AuthModule } from './auth/auth.module';
+import { AuditModule } from './audit';
+import { PdfModule } from './pdf';
+import { StorageModule } from './storage';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -21,6 +25,10 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     OrganizationsModule,
     AuthModule,
+    AuditModule,
+    PdfModule,
+    StorageModule,
+    DocumentsModule,
   ],
 })
 export class AppModule implements NestModule {

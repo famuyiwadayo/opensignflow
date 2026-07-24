@@ -62,4 +62,16 @@ export class OrganizationsRepository {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  findMembershipForUser(input: { userId: string; organizationId: string }) {
+    return this.prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: input.organizationId,
+          userId: input.userId,
+        },
+      },
+      select: organizationMembershipSelect,
+    });
+  }
 }

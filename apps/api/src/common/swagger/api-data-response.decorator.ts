@@ -26,7 +26,10 @@ function dataSchema(model: Type<unknown>, isArray = false) {
   };
 }
 
-export function ApiOkDataResponse(model: Type<unknown>, options: ApiDataResponseOptions = {}) {
+export function ApiOkDataResponse(
+  model: Type<unknown>,
+  options: ApiDataResponseOptions = {},
+) {
   return applyDecorators(
     ApiExtraModels(model),
     ApiOkResponse({
@@ -36,12 +39,46 @@ export function ApiOkDataResponse(model: Type<unknown>, options: ApiDataResponse
   );
 }
 
-export function ApiCreatedDataResponse(model: Type<unknown>, options: ApiDataResponseOptions = {}) {
+export function ApiCreatedDataResponse(
+  model: Type<unknown>,
+  options: ApiDataResponseOptions = {},
+) {
   return applyDecorators(
     ApiExtraModels(model),
     ApiCreatedResponse({
       description: options.description,
       schema: dataSchema(model, options.isArray),
+    }),
+  );
+}
+
+export function ApiPaginatedDataResponse(
+  model: Type<unknown>,
+  options: ApiDataResponseOptions = {},
+) {
+  return applyDecorators(
+    ApiExtraModels(model),
+    ApiOkResponse({
+      description: options.description,
+      schema: {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'array',
+            items: { $ref: getSchemaPath(model) },
+          },
+          pagination: {
+            type: 'object',
+            properties: {
+              limit: { type: 'number', example: 20 },
+              nextCursor: { type: 'string', nullable: true, example: null },
+              hasMore: { type: 'boolean', example: false },
+            },
+            required: ['limit', 'nextCursor', 'hasMore'],
+          },
+        },
+        required: ['data', 'pagination'],
+      },
     }),
   );
 }

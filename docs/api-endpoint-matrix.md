@@ -58,11 +58,14 @@ MVP can create a default personal organization on registration and hide most org
 
 ## Documents
 
+Implemented first slice: see [Documents Module](./documents-module.md).
+
 | Method | Path | Auth | MVP | Idem | Audit | Purpose |
 |---|---|---|---|---|---|---|
 | GET | `/v1/documents` | User | Yes | No | No | List documents with cursor pagination |
 | POST | `/v1/documents` | User | Yes | Yes | Yes | Create document by uploading PDF with multipart form data |
 | GET | `/v1/documents/{documentId}` | User | Yes | No | No | Get document details |
+| GET | `/v1/documents/{documentId}/audit-events` | User | Yes | No | No | List immutable audit events for a document |
 | PATCH | `/v1/documents/{documentId}` | User | Yes | No | Yes | Update title or editable metadata |
 | DELETE | `/v1/documents/{documentId}` | User | Yes | Yes | Yes | Soft-delete draft/cancelled document |
 | POST | `/v1/documents/{documentId}/send` | User | Yes | Yes | Yes | Send document to recipients |

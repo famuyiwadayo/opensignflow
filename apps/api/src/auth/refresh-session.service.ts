@@ -4,12 +4,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { userPublicSelect } from '@/users';
 import { PrismaService } from '@/database';
-import { apiError, ErrorCode, IdGeneratorService } from '@/common';
-
-export type RequestContext = {
-  ipAddress?: string;
-  userAgent?: string;
-};
+import {
+  apiError,
+  ErrorCode,
+  IdGeneratorService,
+  RequestContext,
+} from '@/common';
 
 @Injectable()
 export class RefreshSessionService {

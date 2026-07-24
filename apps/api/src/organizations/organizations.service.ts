@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { IdGeneratorService } from '@/common';
+import { apiError, ErrorCode, IdGeneratorService } from '@/common';
 import { OrganizationsRepository } from './organizations.repository';
 
 @Injectable()
@@ -18,5 +22,41 @@ export class OrganizationsService {
 
   listMembershipsForUser(userId: string) {
     return this.orgRepo.listMembershipsForUser(userId);
+  }
+
+  async resolveActiveMembershipForUser(input: {
+    userId: string;
+    organizationId?: string;
+  }) {
+    if (input.organizationId) {
+      const membership = await this.orgRepo.findMembershipForUser({
+        userId: input.userId,
+        organizationId: input.organizationId,
+      });
+
+      if (!membership) {
+        throw new NotFoundException(
+          apiError(
+            ErrorCode.ORGANIZATION_NOT_FOUND,
+            'Organization was not found.',
+          ),
+        );
+      }
+
+      return membership;
+    }
+
+    const memberships = await this.orgRepo.listMembershipsForUser(input.userId);
+
+    if (memberships.length === 1) {
+      return memberships[0];
+    }
+
+    throw new BadRequestException(
+      apiError(
+        ErrorCode.ORGANIZATION_REQUIRED,
+        'Organization scope is required.',
+      ),
+    );
   }
 }
