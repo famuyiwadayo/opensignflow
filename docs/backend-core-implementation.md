@@ -5,6 +5,7 @@
 The first backend core slice includes:
 
 - `PrismaModule` and `PrismaService`;
+- Prisma is initialized with `@prisma/adapter-pg`;
 - opaque public ID generation;
 - `UsersModule` with repository, service, selectors, and API entity;
 - `OrganizationsModule` with repository, service, controller, selectors, and API entities;

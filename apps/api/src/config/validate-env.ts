@@ -6,7 +6,7 @@ const envSchema = z.object({
     .default('development'),
   API_PORT: z.coerce.number().int().positive().default(4000),
   WEB_APP_URL: z.url().default('http://localhost:3000'),
-  DATABASE_URL: z.string().min(1).optional(),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required.'),
   REDIS_URL: z.string().min(1).optional(),
   JWT_ACCESS_SECRET: z
     .string()
