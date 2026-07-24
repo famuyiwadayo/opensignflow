@@ -79,10 +79,12 @@ Start here:
 
 - [Architecture](docs/architecture.md)
 - [REST API Contract](docs/rest-api-contract.md)
+- [Error Codes](docs/error-codes.md)
 - [API Endpoint Matrix](docs/api-endpoint-matrix.md)
 - [Local Development](docs/local-development.md)
 - [Data Model Draft](docs/data-model.md)
 - [Backend Standards](docs/backend-standards.md)
+- [Backend Core Implementation Notes](docs/backend-core-implementation.md)
 - [Frontend Standards](docs/frontend-standards.md)
 - [Roadmap](docs/roadmap.md)
 - [ADR 0001: Turborepo with separated frontend and backend](docs/adr/0001-use-turborepo-separated-web-api.md)
@@ -90,6 +92,7 @@ Start here:
 - [ADR 0003: camelCase JSON and resource IDs](docs/adr/0003-use-camelcase-json-and-resource-id.md)
 - [ADR 0004: Bun workspaces](docs/adr/0004-use-bun-workspaces.md)
 - [ADR 0005: Backend contract and type ownership](docs/adr/0005-backend-contract-and-type-ownership.md)
+- [ADR 0006: Standardized error codes](docs/adr/0006-standardize-error-codes.md)
 
 ## Product positioning
 
