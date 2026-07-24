@@ -369,33 +369,31 @@ Validation error example:
 
 ## Standard error codes
 
-Error codes should be stable, uppercase snake case strings.
+Error codes must be stable, uppercase snake case strings.
+
+The canonical taxonomy is documented in [Error Codes](./error-codes.md), and the backend source of truth lives in:
+
+```txt
+apps/api/src/common/errors/error-code.ts
+```
 
 Examples:
 
 ```txt
 VALIDATION_ERROR
-UNAUTHORIZED
-FORBIDDEN
-RESOURCE_NOT_FOUND
+INVALID_CREDENTIALS
+EMAIL_ALREADY_REGISTERED
 DOCUMENT_NOT_FOUND
 DOCUMENT_NOT_EDITABLE
-DOCUMENT_ALREADY_SENT
-DOCUMENT_ALREADY_COMPLETED
 RECIPIENT_NOT_FOUND
-SIGNING_TOKEN_INVALID
 SIGNING_TOKEN_EXPIRED
-SIGNING_ALREADY_SUBMITTED
 FILE_TOO_LARGE
-UNSUPPORTED_FILE_TYPE
-PDF_PROCESSING_FAILED
 AI_PROVIDER_UNAVAILABLE
-AI_USAGE_LIMIT_EXCEEDED
 PLAN_LIMIT_EXCEEDED
-RATE_LIMITED
-CONFLICT
 INTERNAL_SERVER_ERROR
 ```
+
+Backend code should import `ErrorCode` instead of hardcoding one-off strings.
 
 ## Pagination
 

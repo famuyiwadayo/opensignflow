@@ -9,14 +9,15 @@ The first backend core slice includes:
 - `UsersModule` with repository, service, selectors, and API entity;
 - `OrganizationsModule` with repository, service, controller, selectors, and API entities;
 - `AuthModule` with register, login, refresh, logout, and me endpoints;
-- manual HS256 access-token signing using Node crypto;
+- access-token signing and verification with `@nestjs/jwt`;
 - refresh sessions stored as SHA-256 token hashes;
 - default personal workspace creation during registration;
 - default free subscription row creation during workspace creation;
 - protected-route guard using Bearer access tokens;
 - `@CurrentUser()` decorator;
 - validation errors configured to return HTTP 422;
-- standard Swagger helpers for `{ data: ... }` response envelopes.
+- standard Swagger helpers for `{ data: ... }` response envelopes;
+- barrel export files for cleaner module/common imports.
 
 ## Implemented endpoints
 
@@ -53,6 +54,8 @@ opensignflow_refresh_token
 
 The database stores only a SHA-256 hash of the refresh token.
 
-## Important follow-up
+## Token implementation
 
-Before production, revisit whether we want to use a dedicated JWT library such as `@nestjs/jwt` or keep the small internal HS256 signer. The current implementation avoids an extra dependency and is suitable for the MVP foundation, but a mature auth module may benefit from standard library support and more extensive token tests.
+Access tokens are generated and verified through `@nestjs/jwt`.
+
+Refresh tokens are intentionally not JWTs. They are high-entropy opaque tokens stored in an HttpOnly cookie, while the database stores only a SHA-256 hash. This makes refresh-token revocation and rotation straightforward.
