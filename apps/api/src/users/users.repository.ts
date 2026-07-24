@@ -1,7 +1,7 @@
 import { PrismaService } from '@/database';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '~/prisma/generated/client';
-import { userPublicSelect } from './users.select';
+import { userAuthSelect, userPublicSelect } from './users.select';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;
 
@@ -34,7 +34,7 @@ export class UsersRepository {
   findByNormalizedEmailForAuth(normalizedEmail: string) {
     return this.prisma.user.findUnique({
       where: { normalizedEmail },
-      select: userPublicSelect,
+      select: userAuthSelect,
     });
   }
 
