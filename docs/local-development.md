@@ -70,6 +70,25 @@ bun run db:generate
 bun run db:migrate
 ```
 
+
+## Prisma driver adapter note
+
+The API uses Prisma with the PostgreSQL driver adapter:
+
+```txt
+@prisma/adapter-pg
+pg
+```
+
+This is why `DATABASE_URL` is required before the NestJS app starts. If you see an error saying Prisma needs a driver adapter, reinstall dependencies and regenerate the Prisma client:
+
+```bash
+bun install
+bun run db:generate
+```
+
+Then restart the API.
+
 ## Run apps
 
 Run everything through Turborepo:
