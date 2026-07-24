@@ -27,6 +27,47 @@ What we want to avoid is accidental manual duplication that drifts over time.
 | Business limits/pricing | Backend config exposed through API | Frontend fetches through API |
 | Generic envelopes/errors | Small shared package or generated API client | Backend/frontend |
 
+
+## Import and barrel export conventions
+
+Use `index.ts` barrel files to keep imports readable, but do not create broad barrels that hide architectural cycles.
+
+Recommended pattern:
+
+```txt
+src/common/errors/index.ts
+src/common/decorators/index.ts
+src/common/id/index.ts
+src/users/index.ts
+src/users/entities/index.ts
+src/organizations/index.ts
+src/organizations/entities/index.ts
+```
+
+Cross-module imports should prefer stable module or submodule barrels:
+
+```ts
+import { apiError, ErrorCode } from '../common';
+import { UserEntity, UsersService } from '../users';
+import { JwtAuthGuard } from '../auth/guards';
+```
+
+Avoid importing from deep leaf files across module boundaries unless there is a clear reason:
+
+```ts
+// Avoid across modules
+import { UserEntity } from '../users/entities/user.entity';
+```
+
+Do not use a barrel file to export everything indiscriminately. In particular:
+
+- `common` must not depend on feature modules;
+- feature barrels should not export controllers unless another module truly needs them;
+- avoid barrels that create circular imports;
+- keep auth/security exports separated when needed, for example `../auth/guards`.
+
+Within a module, direct local imports are still acceptable when they reduce circular imports or make ownership clearer.
+
 ## NestJS module structure
 
 Each major domain module should follow a predictable structure.
@@ -434,6 +475,31 @@ Expected decorators:
 ```
 
 This keeps controller signatures clean.
+
+
+## Error codes
+
+Backend code must use the standardized error code list instead of hardcoded one-off strings.
+
+Source of truth:
+
+```txt
+apps/api/src/common/errors/error-code.ts
+```
+
+Helper:
+
+```txt
+apps/api/src/common/errors/api-error.ts
+```
+
+Example:
+
+```ts
+throw new NotFoundException(apiError(ErrorCode.DOCUMENT_NOT_FOUND, 'Document was not found.'));
+```
+
+Full taxonomy: [Error Codes](./error-codes.md).
 
 ## Filters
 
