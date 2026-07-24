@@ -1,9 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { UsersModule } from './users';
+import { HealthModule } from './health';
+import { PrismaModule } from './database';
 import { validateEnv } from './config/validate-env';
-import { HealthModule } from './health/health.module';
+import { OrganizationsModule } from './organizations';
+import { IdModule, RequestIdMiddleware } from './common';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -11,7 +15,12 @@ import { HealthModule } from './health/health.module';
       isGlobal: true,
       validate: validateEnv,
     }),
+    PrismaModule,
+    IdModule,
     HealthModule,
+    UsersModule,
+    OrganizationsModule,
+    AuthModule,
   ],
 })
 export class AppModule implements NestModule {
