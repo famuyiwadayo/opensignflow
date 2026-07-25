@@ -11,6 +11,10 @@ GET  /v1/documents
 POST /v1/documents
 GET  /v1/documents/{documentId}
 GET  /v1/documents/{documentId}/audit-events
+GET  /v1/documents/{documentId}/recipients
+POST /v1/documents/{documentId}/recipients
+PATCH /v1/documents/{documentId}/recipients/{recipientId}
+DELETE /v1/documents/{documentId}/recipients/{recipientId}
 GET  /v1/documents/{documentId}/download-url?variant=original|completed
 ```
 
@@ -270,3 +274,42 @@ Returns the document's immutable audit trail in descending event-time order. The
   "pagination": { "limit": 20, "nextCursor": null, "hasMore": false }
 }
 ```
+
+
+## Recipients
+
+Recipients are managed only while the document status is `DRAFT`.
+
+```txt
+GET    /v1/documents/{documentId}/recipients
+POST   /v1/documents/{documentId}/recipients
+PATCH  /v1/documents/{documentId}/recipients/{recipientId}
+DELETE /v1/documents/{documentId}/recipients/{recipientId}
+```
+
+Create and update bodies use `name`, `email`, and `signingOrder`; create requires `name` and `email`. Emails are normalized to lowercase before storage and a document cannot contain the same email twice. Duplicate emails return `RECIPIENT_ALREADY_EXISTS`; a missing recipient returns `RECIPIENT_NOT_FOUND`; attempts to mutate a sent or completed document return `DOCUMENT_NOT_EDITABLE`.
+
+Every mutation writes an immutable `RECIPIENT_CREATED`, `RECIPIENT_UPDATED`, or `RECIPIENT_DELETED` audit event. Listing returns a `{ "data": [...] }` envelope ordered by `signingOrder` and then creation time.
+
+## Document fields
+
+The PDF editor field API is available for draft documents:
+
+```txt
+GET    /v1/documents/{documentId}/fields
+POST   /v1/documents/{documentId}/fields
+PATCH  /v1/documents/{documentId}/fields/{fieldId}
+DELETE /v1/documents/{documentId}/fields/{fieldId}
+```
+
+A field is assigned to a recipient and supports `SIGNATURE`, `INITIALS`, `TEXT`, `DATE`, and `CHECKBOX` types. Coordinates use normalized page units (`x`, `y`, `width`, `height` in the inclusive 0–1 range; width and height must be greater than zero). A field cannot extend beyond its page, and its page number cannot exceed the uploaded PDF's page count. Mutations record `DOCUMENT_FIELD_CREATED`, `DOCUMENT_FIELD_UPDATED`, or `DOCUMENT_FIELD_DELETED` audit events.
+
+## Sending workflow foundation
+
+```http
+POST /v1/documents/{documentId}/send
+```
+
+Sending is an atomic state transition from `DRAFT` to `SENT`. It requires at least one recipient, at least one field, and every field to be assigned to one of the document's recipients. On success, OpenSignFlow creates one signing request per recipient, stores only SHA-256 hashes of newly generated signing tokens, marks pending recipients as `SENT`, records `DOCUMENT_SENT`, and timestamps the document.
+
+Email delivery is intentionally not wired into this foundation yet: BullMQ delivery jobs and the mail provider will be added before exposing recipient signing links. Tokens are never returned by this endpoint or persisted in plaintext.

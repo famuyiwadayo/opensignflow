@@ -13,6 +13,7 @@ import { PdfModule } from './pdf';
 import { StorageModule } from './storage';
 import { DocumentsModule } from './documents/documents.module';
 import { RecipientsModule } from './recipients';
+import { DocumentFieldsModule } from './document-fields';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RecipientsModule } from './recipients';
     PdfModule,
     StorageModule,
     DocumentsModule,
+    DocumentFieldsModule,
     RecipientsModule,
   ],
 })
