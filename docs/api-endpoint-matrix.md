@@ -106,7 +106,7 @@ Success:
 |---|---|---|---|---|---|---|
 | GET | `/v1/documents/{documentId}/fields` | User | Yes | No | No | List fields for editor |
 | POST | `/v1/documents/{documentId}/fields` | User | Yes | Optional | Yes | Create one field |
-| PUT | `/v1/documents/{documentId}/fields` | User | Yes | Yes | Yes | Replace full field collection for autosave/batch save |
+| PUT | `/v1/documents/{documentId}/fields` | User | Later | Yes | Yes | Replace full field collection for autosave/batch save |
 | PATCH | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes | No | Yes | Update a field |
 | DELETE | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes | Yes | Yes | Delete a field |
 
