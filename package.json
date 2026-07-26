@@ -22,12 +22,17 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "format": "prettier --write \"**/*.{ts.tsx,js,jsx,json,md,yml,yaml,css}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
     "clean": "turbo clean && rm -rf node_modules",
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
-    "db:studio": "turbo db:studio"
+    "db:studio": "turbo db:studio",
+    "db:deploy": "turbo db:deploy",
+    "db:reset": "turbo db:reset",
+    "db:migrate:create": "turbo db:migrate:create --",
+    "db:status": "turbo db:status",
+    "db:push": "turbo db:push"
   },
   "devDependencies": {
     "eslint": "^10.7.0",
