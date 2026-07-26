@@ -14,6 +14,7 @@ import { StorageModule } from './storage';
 import { DocumentsModule } from './documents/documents.module';
 import { RecipientsModule } from './recipients';
 import { DocumentFieldsModule } from './document-fields';
+import { SigningModule } from './signing';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DocumentFieldsModule } from './document-fields';
     DocumentsModule,
     DocumentFieldsModule,
     RecipientsModule,
+    SigningModule,
   ],
 })
 export class AppModule implements NestModule {

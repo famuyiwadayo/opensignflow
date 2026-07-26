@@ -6,16 +6,21 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "bun run --watch src/main.ts",
-    "build": "tsc --noEmit",
+    "dev": "nest start --watch",
+    "build": "nest build",
     "start": "node dist/main.js",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "jest",
     "clean": "rm -rf dist coverage",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:migrate": "prisma migrate dev --name dev",
+    "db:studio": "prisma studio",
+    "db:deploy": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset --force",
+    "db:migrate:create": "prisma migrate dev --create-only --name",
+    "db:status": "prisma migrate status",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1093.0",
