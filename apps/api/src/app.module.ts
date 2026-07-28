@@ -15,6 +15,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { RecipientsModule } from './recipients';
 import { DocumentFieldsModule } from './document-fields';
 import { SigningModule } from './signing';
+import { JobsModule } from './jobs';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SigningModule } from './signing';
     DocumentsModule,
     DocumentFieldsModule,
     RecipientsModule,
+    JobsModule,
     SigningModule,
   ],
 })
