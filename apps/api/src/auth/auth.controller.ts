@@ -22,10 +22,9 @@ import {
   CurrentUser,
 } from '@/common';
 import { JwtAuthGuard } from './guards';
-import type { AuthenticatedUser } from '@/common';
+import type { AuthenticatedUser, RequestContext } from '@/common';
 import { AuthService } from './auth.service';
 import { AuthResponseDto, LoginDto, MeResponseDto, RegisterDto } from './dto';
-import type { RequestContext } from './refresh-session.service';
 
 const REFRESH_COOKIE_NAME = 'opensignflow_refresh_token';
 
