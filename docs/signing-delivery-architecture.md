@@ -453,7 +453,7 @@ Requirements:
 
 ### Key management
 
-For local development, the key can come from `apps/api/.env` and `apps/worker/.env`.
+For local development, the key comes from the repository-root `.env`.
 
 For production, it should come from a managed secret system. The API and worker need access to the same active key set, but no browser, frontend runtime, email provider, or database role should receive it.
 
@@ -693,7 +693,7 @@ bun run db:deploy
 Create the worker environment file:
 
 ```bash
-cp apps/worker/.env.example apps/worker/.env
+cp .env.example .env
 ```
 
 Run API and worker in separate terminals:
