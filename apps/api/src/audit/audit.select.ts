@@ -1,4 +1,4 @@
-import { Prisma } from '~/prisma/generated/client';
+import { Prisma } from '@opensignflow/database';
 
 export const auditEventApiSelect = {
   id: true,

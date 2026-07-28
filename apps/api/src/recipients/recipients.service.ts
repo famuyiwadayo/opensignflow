@@ -9,7 +9,7 @@ import {
   AuditEventType,
   DocumentStatus,
   Prisma,
-} from '~/prisma/generated/client';
+} from '@opensignflow/database';
 
 import { AuditService } from '@/audit';
 import {
@@ -54,7 +54,7 @@ export class RecipientsService {
   }): Promise<RecipientEntity> {
     const document = await this.getEditableDocument(input);
     const recipient = await this.createRecipient({
-      id: this.idGenerator.generate('rcp'),
+      id: this.idGenerator.generate('recipient'),
       documentId: document.id,
       name: input.dto.name.trim(),
       email: this.normalizeEmail(input.dto.email),

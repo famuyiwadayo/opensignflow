@@ -10,7 +10,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { DocumentStatus } from '~/prisma/generated/enums';
+import { DocumentStatus } from '@opensignflow/database';
 
 export class ListDocumentsQueryDto {
   @ApiPropertyOptional({ example: 20, default: 20, minimum: 1, maximum: 100 })

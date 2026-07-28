@@ -25,7 +25,7 @@ export class RefreshSessionService {
 
     await this.prisma.userSession.create({
       data: {
-        id: this.idGenerator.generate('ses'),
+        id: this.idGenerator.generate('userSession'),
         userId,
         refreshTokenHash: this.hashToken(token),
         ipAddress: context.ipAddress,

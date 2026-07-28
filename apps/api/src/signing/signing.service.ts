@@ -6,7 +6,7 @@ import {
   DocumentStatus,
   RecipientStatus,
   SigningRequestStatus,
-} from '~/prisma/generated/client';
+} from '@opensignflow/database';
 import {
   apiError,
   ErrorCode,
@@ -76,7 +76,7 @@ export class SigningService {
       );
     const now = new Date();
     const signingRequests = recipients.map((recipient) => ({
-      id: this.idGenerator.generate('sreq'),
+      id: this.idGenerator.generate('signingRequest'),
       documentId: document.id,
       recipientId: recipient.id,
       recipientEmail: recipient.email,

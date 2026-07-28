@@ -1,8 +1,10 @@
-import { PrismaPg } from '@prisma/adapter-pg';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 
-import { PrismaClient } from '~/prisma/generated/client';
+import {
+  createPrismaClientOptions,
+  PrismaClient,
+} from '@opensignflow/database';
 
 @Injectable()
 export class PrismaService
@@ -16,14 +18,12 @@ export class PrismaService
       throw new Error('DATABASE_URL is required to initialize Prisma.');
     }
 
-    const adapter = new PrismaPg({ connectionString: databaseUrl });
-    super({
-      adapter,
-      log:
-        configService.get('NODE_ENV') === 'development'
-          ? ['warn', 'error']
-          : ['error'],
-    });
+    super(
+      createPrismaClientOptions({
+        databaseUrl,
+        nodeEnv: configService.get('NODE_ENV'),
+      }),
+    );
   }
   async onModuleInit() {
     await this.$connect();

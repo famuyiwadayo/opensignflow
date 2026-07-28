@@ -18,7 +18,7 @@ What we want to avoid is accidental manual duplication that drifts over time.
 
 | Concern | Source of truth | Consumed by |
 |---|---|---|
-| Database schema | `apps/api/prisma/schema.prisma` | Prisma Client/backend only |
+| Database schema | `packages/database/prisma/schema.prisma` | Prisma Client/backend only |
 | Backend request validation | NestJS DTO classes | Controllers, Swagger/OpenAPI |
 | API response contract | NestJS API entity classes | Controllers, Swagger/OpenAPI |
 | Frontend API types | Generated from OpenAPI | Next.js frontend |
@@ -27,6 +27,22 @@ What we want to avoid is accidental manual duplication that drifts over time.
 | Business limits/pricing | Backend config exposed through API | Frontend fetches through API |
 | Generic envelopes/errors | Small shared package or generated API client | Backend/frontend |
 
+
+
+## Workspace script binary convention
+
+Workspace package scripts should stay readable and conventional:
+
+```json
+{
+  "lint": "eslint "src/**/*.ts"",
+  "typecheck": "tsc -p tsconfig.json --noEmit"
+}
+```
+
+Repository-wide CLI tools such as ESLint, TypeScript, Jest, Prisma, Turbo, Next, and Nest CLI should be available from the root `package.json` devDependencies.
+
+If a workspace script cannot find a CLI binary, run `bun install` from the repository root. Avoid hardcoding long `../../node_modules/...` binary paths unless we have exhausted cleaner options.
 
 ## Import and barrel export conventions
 
@@ -208,7 +224,7 @@ export class UsersRepository {
 Prisma models live in:
 
 ```txt
-apps/api/prisma/schema.prisma
+packages/database/prisma/schema.prisma
 ```
 
 They represent database tables and persistence concerns.
@@ -669,3 +685,28 @@ NestJS DTOs and entities own the API contract.
 OpenAPI generates frontend API types.
 
 The shared package only contains small framework-agnostic helpers and generic contract primitives.
+
+## Constant ownership
+
+Do not duplicate stable strings across API and worker code.
+
+```txt
+packages/shared
+  Stable cross-process IDs, queue names, job names, and job payload contracts.
+
+packages/database
+  Prisma-generated persistence enums and types.
+
+feature module
+  Feature-only operational policy such as HTTP enqueue timeouts, polling intervals,
+  worker concurrency, or retry/lease durations.
+```
+
+ID callers use semantic names, never raw prefixes:
+
+```ts
+idGenerator.generate('document');
+idGenerator.generate('outboxEvent');
+```
+
+The generator resolves the raw prefix exclusively through `ID_PREFIXES` in `@opensignflow/shared`.

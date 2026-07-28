@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/database';
-import { auditEventApiSelect } from './audit.select';
+import { AuditEventApiRecord, auditEventApiSelect } from './audit.select';
 
 @Injectable()
 export class AuditRepository {
@@ -12,7 +12,7 @@ export class AuditRepository {
     documentId: string;
     limit: number;
     cursorId?: string;
-  }) {
+  }): Promise<AuditEventApiRecord[]> {
     return this.prisma.auditEvent.findMany({
       where: {
         organizationId: input.organizationId,

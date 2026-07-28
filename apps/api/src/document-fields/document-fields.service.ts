@@ -22,7 +22,7 @@ import {
   AuditActorType,
   AuditEventType,
   DocumentStatus,
-} from '~/prisma/generated/enums';
+} from '@opensignflow/database';
 
 @Injectable()
 export class DocumentFieldsService {
@@ -57,7 +57,7 @@ export class DocumentFieldsService {
     const document = await this.editable(input);
     await this.validate(input.dto, document.id, document.pageCount);
     const field = await this.fieldsRepository.create({
-      id: this.idGenerator.generate('fld'),
+      id: this.idGenerator.generate('documentField'),
       documentId: document.id,
       recipientId: input.dto.recipientId,
       type: input.dto.type,

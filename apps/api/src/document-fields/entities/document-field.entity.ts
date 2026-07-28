@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import type { DocumentFieldApiRecord } from '../document-fields.select';
-import { DocumentFieldType } from '~/prisma/generated/enums';
+import { DocumentFieldType } from '@opensignflow/database';
 
 export class DocumentFieldEntity {
   @ApiProperty({ example: 'fld_K9Ys4vF7gH6m2Qz2N8aBcD' })

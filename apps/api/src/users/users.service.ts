@@ -26,6 +26,6 @@ export class UsersService {
   }
 
   createUserId(): string {
-    return this.idGenerator.generate('usr');
+    return this.idGenerator.generate('user');
   }
 }
