@@ -33,6 +33,7 @@ yarn-error.log*
 
 # Prisma
 apps/api/prisma/dev.db
+packages/database/src/generated/
 
 # local package-manager/cache artifacts
 .local
