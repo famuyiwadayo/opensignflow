@@ -57,19 +57,87 @@ password: opensignflow-secret
 Copy examples:
 
 ```bash
-cp apps/api/.env.example apps/api/.env
+cp .env.example .env
 cp apps/web/.env.example apps/web/.env.local
 ```
 
 ## Database
 
-After installing dependencies and starting Postgres:
+See also: [Database Workflow](./database-workflow.md).
+
+
+After installing dependencies and starting Postgres, generate Prisma Client and apply committed migrations:
 
 ```bash
 bun run db:generate
-bun run db:migrate
+bun run db:deploy
 ```
 
+The repository includes an initial migration at:
+
+```txt
+apps/api/prisma/migrations/20260724140000_init/migration.sql
+```
+
+If the API logs an error like:
+
+```txt
+The table `public.users` does not exist in the current database.
+```
+
+it means the API connected to Postgres, but migrations have not been applied to that database yet. Stop the API, run:
+
+```bash
+bun run db:deploy
+```
+
+then restart:
+
+```bash
+bun run dev
+```
+
+For a disposable local database, you can reset everything and reapply migrations:
+
+```bash
+bun run db:reset
+```
+
+Be careful: `db:reset` deletes local database data.
+
+
+
+## Bun workspace binary note
+
+Workspace scripts use normal readable commands such as:
+
+```json
+"lint": "eslint "src/**/*.ts""
+```
+
+CLI tools such as ESLint, TypeScript, Prisma, Jest, Turbo, Next, and Nest CLI are centralized in the root `package.json` devDependencies.
+
+If you see errors like:
+
+```txt
+/bin/bash: eslint: command not found
+```
+
+it usually means Bun has not linked/install the root workspace dependencies yet. From the repository root, run:
+
+```bash
+bun install
+```
+
+If the issue persists after switching package-manager setup, clear old install artifacts and reinstall:
+
+```bash
+rm -rf node_modules bun.lock .turbo
+bun install
+bun run lint
+```
+
+Commit the regenerated `bun.lock` afterward.
 
 ## Prisma driver adapter note
 
@@ -119,3 +187,13 @@ bun run format
 - `package.json` is the workspace source of truth via the `workspaces` field.
 - We intentionally do not keep `pnpm-workspace.yaml` or `pnpm-lock.yaml`.
 - Commit `bun.lock` after running `bun install` locally.
+
+## Background worker
+
+Configure root `.env` from `.env.example`, then run the worker alongside the API:
+
+```bash
+bun run dev:worker
+```
+
+With Docker Mailpit running, signing-request email messages appear at `http://localhost:8025`.
