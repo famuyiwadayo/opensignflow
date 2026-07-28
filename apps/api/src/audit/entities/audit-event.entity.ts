@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import type { AuditEventApiRecord } from '../audit.select';
-import { AuditActorType, AuditEventType } from '~/prisma/generated/enums';
+import { AuditActorType, AuditEventType } from '@opensignflow/database';
 
 export class AuditEventEntity {
   @ApiProperty({ example: 'aud_K9Ys4vF7gH6m2Qz2N8aBcD' })

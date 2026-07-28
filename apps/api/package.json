@@ -26,6 +26,7 @@
     "@opensignflow/queue": "workspace:*",
     "@opensignflow/shared": "workspace:*",
     "@opensignflow/config": "workspace:*",
+    "@opensignflow/database": "workspace:*",
     "@aws-sdk/client-s3": "^3.1093.0",
     "@aws-sdk/s3-request-presigner": "^3.1093.0",
     "@nestjs/common": "^11.0.1",

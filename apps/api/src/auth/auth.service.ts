@@ -70,7 +70,7 @@ export class AuthService {
       async (tx) => {
         const createdUser = await this.usersRepository.create(
           {
-            id: this.idGenerator.generate('usr'),
+            id: this.idGenerator.generate('user'),
             email: dto.email.trim(),
             normalizedEmail,
             name: dto.name.trim(),

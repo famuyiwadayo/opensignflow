@@ -6,15 +6,11 @@ import {
   IdGeneratorService,
   type RequestContext,
 } from '@/common';
-import { PrismaService } from '../database';
+import { PrismaService } from '@/database';
 import { ListAuditEventsQueryDto } from './dto';
 import { AuditEventEntity } from './entities';
 import { AuditRepository } from './audit.repository';
-import {
-  AuditActorType,
-  AuditEventType,
-  Prisma,
-} from '~/prisma/generated/client';
+import { AuditActorType, AuditEventType, Prisma } from '@opensignflow/database';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;
 
@@ -71,7 +67,7 @@ export class AuditService {
   record(input: RecordAuditEventInput, client: PrismaWriter = this.prisma) {
     return client.auditEvent.create({
       data: {
-        id: this.idGenerator.generate('aud'),
+        id: this.idGenerator.generate('auditEvent'),
         organizationId: input.organizationId,
         documentId: input.documentId,
         actorUserId: input.actorUserId,

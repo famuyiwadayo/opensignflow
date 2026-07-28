@@ -1,3 +1,4 @@
+/** Stable public-ID prefixes. Callers use the semantic key, never the raw prefix. */
 export const ID_PREFIXES = {
   user: 'usr',
   organization: 'org',
@@ -9,6 +10,7 @@ export const ID_PREFIXES = {
   signingRequest: 'sreq',
   signingSubmission: 'ssub',
   auditEvent: 'aud',
+  outboxEvent: 'obx',
   aiAnalysis: 'ai',
   job: 'job',
   subscription: 'subsc',

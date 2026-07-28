@@ -1,13 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { createQueue, createWorker } from '@opensignflow/queue';
 import {
+  QueueJobName,
   QueueName,
   type SendSigningEmailJob,
   type SigningEmailDeadLetterJob,
 } from '@opensignflow/shared';
 import { MailService, signingRequestTemplate } from '@/mail';
-
-const DLQ_NAME = 'opensignflow-signing-email-dlq';
 
 @Injectable()
 export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
@@ -18,10 +17,12 @@ export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly mailService: MailService) {}
 
   async onModuleInit() {
-    const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6380';
-    this.logger.log(`${redisUrl}`);
+    const redisUrl = process.env.REDIS_URL;
+    if (!redisUrl) {
+      throw new Error('REDIS_URL is required before starting signing-email processing.');
+    }
     this.deadLetterQueue = createQueue<SigningEmailDeadLetterJob>({
-      name: DLQ_NAME,
+      name: QueueName.SIGNING_EMAIL_DLQ,
       redisUrl,
       connectionName: 'worker-signing-email-dlq-producer',
       role: 'producer',
@@ -36,7 +37,9 @@ export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
     this.worker.on('error', (error) => {
       this.logger.error('Signing email worker connection or processing error.', error.stack);
     });
+
     await Promise.all([this.worker.waitUntilReady(), this.deadLetterQueue.waitUntilReady()]);
+
     this.worker.on('active', (job) => {
       this.logger.log(
         `Processing signing email job ${job.id} for signingRequestId=${job.data.signingRequestId}.`,
@@ -54,7 +57,7 @@ export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
       );
       if (!job || job.attemptsMade < (job.opts.attempts ?? 1)) return;
       void this.deadLetterQueue
-        ?.add('signing-email-delivery-failed', {
+        ?.add(QueueJobName.SIGNING_EMAIL_DELIVERY_FAILED, {
           originalJobId: job.id ?? 'unknown',
           signingRequestId: job.data.signingRequestId,
           documentId: job.data.documentId,

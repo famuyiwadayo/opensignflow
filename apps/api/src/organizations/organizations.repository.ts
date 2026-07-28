@@ -1,13 +1,17 @@
 import { IdGeneratorService } from '@/common';
 import { PrismaService } from '@/database';
 import { Injectable } from '@nestjs/common';
+
+import {
+  OrganizationMembershipRecord,
+  organizationMembershipSelect,
+} from './organizations.select';
 import {
   OrganizationRole,
   PlanCode,
   Prisma,
   SubscriptionStatus,
-} from '~/prisma/generated/client';
-import { organizationMembershipSelect } from './organizations.select';
+} from '@opensignflow/database';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;
 
@@ -24,18 +28,18 @@ export class OrganizationsRepository {
   ) {
     const org = await client.organization.create({
       data: {
-        id: this.idGenerator.generate('org'),
+        id: this.idGenerator.generate('organization'),
         name: input.name,
         members: {
           create: {
-            id: this.idGenerator.generate('mem'),
+            id: this.idGenerator.generate('organizationMember'),
             userId: input.userId,
             role: OrganizationRole.OWNER,
           },
         },
         subscriptions: {
           create: {
-            id: this.idGenerator.generate('subsc'),
+            id: this.idGenerator.generate('subscription'),
             planCode: PlanCode.FREE,
             status: SubscriptionStatus.ACTIVE,
           },
@@ -55,7 +59,9 @@ export class OrganizationsRepository {
     });
   }
 
-  listMembershipsForUser(userId: string) {
+  listMembershipsForUser(
+    userId: string,
+  ): Promise<OrganizationMembershipRecord[]> {
     return this.prisma.organizationMember.findMany({
       where: { userId },
       select: organizationMembershipSelect,

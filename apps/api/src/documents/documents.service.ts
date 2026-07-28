@@ -20,7 +20,7 @@ import { StorageService } from '@/storage';
 import type { CreateDocumentDto, ListDocumentsQueryDto } from './dto';
 import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
 import { DocumentsRepository } from './documents.repository';
-import { AuditActorType, AuditEventType } from '~/prisma/generated/enums';
+import { AuditActorType, AuditEventType } from '@opensignflow/database';
 
 const MAX_PDF_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -58,7 +58,7 @@ export class DocumentsService {
         organizationId: input.organizationId,
       });
 
-    const documentId = this.idGenerator.generate('doc');
+    const documentId = this.idGenerator.generate('document');
     const title =
       input.dto.title?.trim() || this.titleFromFileName(file.originalname);
     const pageCount = await this.pdfService.getPageCount(file.buffer);

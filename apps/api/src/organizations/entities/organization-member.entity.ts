@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OrganizationRole } from '~/prisma/generated/enums';
+import { OrganizationRole } from '@opensignflow/database';
 
 import { OrganizationEntity } from './organization.entity';
 import type { OrganizationMembershipRecord } from '../organizations.select';

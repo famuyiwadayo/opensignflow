@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import type { RecipientApiRecord } from '../recipients.select';
-import { RecipientStatus } from '~/prisma/generated/enums';
+import { RecipientStatus } from '@opensignflow/database';
 
 export class RecipientEntity {
   @ApiProperty({ example: 'rcp_K9Ys4vF7gH6m2Qz2N8aBcD' })

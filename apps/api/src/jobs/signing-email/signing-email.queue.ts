@@ -1,10 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 import { createQueue } from '@opensignflow/queue';
-import { QueueName, type SendSigningEmailJob } from '@opensignflow/shared';
+import {
+  QueueJobName,
+  QueueName,
+  type SendSigningEmailJob,
+} from '@opensignflow/shared';
 
-export const SIGNING_EMAIL_JOB_NAME = 'send-signing-request';
 const ENQUEUE_TIMEOUT_MS = 5_000;
 
 /** Raised when Redis cannot accept a signing-email job within the bounded API timeout. */
@@ -18,7 +20,7 @@ export class SigningEmailQueueUnavailableError extends Error {
 @Injectable()
 export class SigningEmailQueue implements OnModuleDestroy {
   private readonly logger = new Logger(SigningEmailQueue.name);
-  private readonly queue: ReturnType<typeof createQueue>;
+  private readonly queue: ReturnType<typeof createQueue<SendSigningEmailJob>>;
 
   constructor(config: ConfigService) {
     this.queue = createQueue<SendSigningEmailJob>({
@@ -43,7 +45,7 @@ export class SigningEmailQueue implements OnModuleDestroy {
   async enqueue(payload: SendSigningEmailJob) {
     try {
       return await this.withTimeout(
-        this.queue.add(SIGNING_EMAIL_JOB_NAME, payload, {
+        this.queue.add(QueueJobName.SEND_SIGNING_EMAIL, payload, {
           jobId: `signing-request-${payload.signingRequestId}`,
         }),
       );
