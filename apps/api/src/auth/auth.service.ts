@@ -4,14 +4,19 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { apiError, ErrorCode, IdGeneratorService } from '../common';
-import { PrismaService } from '../database';
+import {
+  apiError,
+  ErrorCode,
+  IdGeneratorService,
+  RequestContext,
+} from '@/common';
+import { PrismaService } from '@/database';
 import {
   OrganizationMembershipEntity,
   OrganizationsRepository,
   OrganizationsService,
-} from '../organizations';
-import { UserEntity, UsersRepository, UsersService } from '../users';
+} from '@/organizations';
+import { UserEntity, UsersRepository, UsersService } from '@/users';
 import type {
   AuthResponseDto,
   LoginDto,
@@ -19,10 +24,7 @@ import type {
   RegisterDto,
 } from './dto';
 import { PasswordService } from './password.service';
-import {
-  RefreshSessionService,
-  RequestContext,
-} from './refresh-session.service';
+import { RefreshSessionService } from './refresh-session.service';
 import { TokenService } from './token.service';
 
 type AuthResult = {

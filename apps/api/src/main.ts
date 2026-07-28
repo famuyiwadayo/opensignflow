@@ -1,15 +1,20 @@
 import 'reflect-metadata';
 
-import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
+
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+
+import { loadRepositoryEnvironment } from '@opensignflow/config';
 
 import { AppModule } from './app.module';
-import { ApiExceptionFilter } from './common/filters/api-exception.filter';
+import { ApiExceptionFilter } from '@/common/';
 
 async function bootstrap() {
+  loadRepositoryEnvironment();
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });

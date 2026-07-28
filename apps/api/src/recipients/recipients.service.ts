@@ -202,10 +202,14 @@ export class RecipientsService {
   }
 
   private rethrowDuplicateEmail(error: unknown): never {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    // Do not rely solely on instanceof: driver-adapter and duplicate-package
+    // boundaries can produce a known Prisma error from a different runtime copy.
+    const prismaCode =
+      error instanceof Prisma.PrismaClientKnownRequestError
+        ? error.code
+        : this.errorCode(error);
+
+    if (prismaCode === 'P2002') {
       throw new ConflictException(
         apiError(
           ErrorCode.RECIPIENT_ALREADY_EXISTS,
@@ -213,7 +217,16 @@ export class RecipientsService {
         ),
       );
     }
+
     throw error;
+  }
+
+  private errorCode(error: unknown): string | undefined {
+    if (typeof error !== 'object' || error === null || !('code' in error)) {
+      return undefined;
+    }
+
+    return typeof error.code === 'string' ? error.code : undefined;
   }
 
   private normalizeEmail(email: string): string {

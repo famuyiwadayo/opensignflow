@@ -17,6 +17,7 @@ import {
 import { PrismaService } from '@/database';
 import { DocumentsService } from '@/documents';
 import { AuditService } from '@/audit';
+import { SigningEmailQueue } from '@/jobs';
 
 @Injectable()
 export class SigningService {
@@ -25,6 +26,7 @@ export class SigningService {
     private readonly prisma: PrismaService,
     private readonly idGenerator: IdGeneratorService,
     private readonly auditService: AuditService,
+    private readonly signingEmailQueue: SigningEmailQueue,
   ) {}
 
   async send(input: {
@@ -43,7 +45,7 @@ export class SigningService {
       );
     const recipients = await this.prisma.recipient.findMany({
       where: { documentId: document.id },
-      select: { id: true },
+      select: { id: true, email: true, name: true },
     });
     const fields = await this.prisma.documentField.findMany({
       where: { documentId: document.id },
@@ -73,6 +75,14 @@ export class SigningService {
         ),
       );
     const now = new Date();
+    const signingRequests = recipients.map((recipient) => ({
+      id: this.idGenerator.generate('sreq'),
+      documentId: document.id,
+      recipientId: recipient.id,
+      recipientEmail: recipient.email,
+      recipientName: recipient.name,
+      signingToken: this.newToken(),
+    }));
     await this.prisma.$transaction(async (tx) => {
       const transitioned = await tx.document.updateMany({
         where: {
@@ -94,11 +104,11 @@ export class SigningService {
         data: { status: RecipientStatus.SENT },
       });
       await tx.signingRequest.createMany({
-        data: recipients.map((recipient) => ({
-          id: this.idGenerator.generate('sreq'),
-          documentId: document.id,
-          recipientId: recipient.id,
-          tokenHash: this.hashToken(this.newToken()),
+        data: signingRequests.map((request) => ({
+          id: request.id,
+          documentId: request.documentId,
+          recipientId: request.recipientId,
+          tokenHash: this.hashToken(request.signingToken),
           status: SigningRequestStatus.PENDING,
           expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
           sentAt: now,
@@ -121,6 +131,19 @@ export class SigningService {
         tx,
       );
     });
+    await Promise.all(
+      signingRequests.map((request) =>
+        this.signingEmailQueue.enqueue({
+          signingRequestId: request.id,
+          documentId: request.documentId,
+          recipientId: request.recipientId,
+          recipientEmail: request.recipientEmail,
+          recipientName: request.recipientName,
+          documentTitle: document.title,
+          signingToken: request.signingToken,
+        }),
+      ),
+    );
     return this.documentsService.getById(input);
   }
   private newToken() {
