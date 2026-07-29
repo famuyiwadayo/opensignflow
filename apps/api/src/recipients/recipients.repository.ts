@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
+import { RecipientRole } from '@opensignflow/database';
+
 import { PrismaService } from '@/database';
 import { RecipientApiRecord, recipientApiSelect } from './recipients.select';
 
@@ -21,6 +23,7 @@ export class RecipientsRepository {
     name: string;
     email: string;
     signingOrder: number;
+    role: RecipientRole;
   }): Promise<RecipientApiRecord> {
     return this.prisma.recipient.create({ data, select: recipientApiSelect });
   }
@@ -35,17 +38,28 @@ export class RecipientsRepository {
     });
   }
 
+  countFieldsForRecipient(input: {
+    recipientId: string;
+    documentId: string;
+  }): Promise<number> {
+    return this.prisma.documentField.count({
+      where: { recipientId: input.recipientId, documentId: input.documentId },
+    });
+  }
+
   update(input: {
     recipientId: string;
     name?: string;
     email?: string;
     signingOrder?: number;
+    role?: RecipientRole;
   }): Promise<RecipientApiRecord> {
     return this.prisma.recipient.update({
       where: { id: input.recipientId },
       data: {
         name: input.name,
         email: input.email,
+        role: input.role,
         signingOrder: input.signingOrder,
       },
       select: recipientApiSelect,

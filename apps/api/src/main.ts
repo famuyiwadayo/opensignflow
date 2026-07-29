@@ -7,14 +7,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
-import { loadRepositoryEnvironment } from '@opensignflow/config';
-
 import { AppModule } from './app.module';
 import { ApiExceptionFilter } from '@/common/';
 
 async function bootstrap() {
-  loadRepositoryEnvironment();
-
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });

@@ -26,7 +26,11 @@ import {
   CurrentUser,
   type AuthenticatedUser,
 } from '@/common';
-import { CreateDocumentFieldDto, UpdateDocumentFieldDto } from './dto';
+import {
+  BulkAssignDocumentFieldsDto,
+  CreateDocumentFieldDto,
+  UpdateDocumentFieldDto,
+} from './dto';
 import { DocumentFieldEntity } from './entities';
 import { DocumentFieldsService } from './document-fields.service';
 
@@ -67,6 +71,27 @@ export class DocumentFieldsController {
         context: this.context(request),
       }),
     };
+  }
+
+  @Patch('bulk-assignment')
+  @ApiOperation({
+    summary: 'Assign multiple draft-document fields to one signer',
+  })
+  @ApiOkDataResponse(DocumentFieldEntity, { isArray: true })
+  async bulkAssign(
+    @CurrentUser() user: AuthenticatedUser,
+    @Headers('x-organization-id') organizationId: string | undefined,
+    @Param('documentId') documentId: string,
+    @Body() dto: BulkAssignDocumentFieldsDto,
+    @Req() request: Request,
+  ) {
+    return this.fieldsService.bulkAssign({
+      user,
+      organizationId,
+      documentId,
+      dto,
+      context: this.context(request),
+    });
   }
 
   @Patch(':fieldId')

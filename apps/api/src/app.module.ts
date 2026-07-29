@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { loadRepositoryEnvironment } from '@opensignflow/config';
+
 import { UsersModule } from './users';
 import { HealthModule } from './health';
 import { PrismaModule } from './database';
@@ -17,10 +19,19 @@ import { DocumentFieldsModule } from './document-fields';
 import { SigningModule } from './signing';
 import { JobsModule } from './jobs';
 
+// Module decorators evaluate while AppModule is imported, before main.ts can
+// enter bootstrap(). Load root .env here so ConfigModule validation sees it.
+loadRepositoryEnvironment();
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // Root .env is loaded explicitly during bootstrap by @opensignflow/config.
+      // Do not let Nest load a second app-local env file.
+      ignoreEnvFile: true,
+      // Validate the authoritative runtime environment directly. ConfigModule's
+      // file-derived `config` argument is intentionally empty in this setup.
       validate: validateEnv,
     }),
     PrismaModule,

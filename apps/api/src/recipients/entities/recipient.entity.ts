@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import type { RecipientApiRecord } from '../recipients.select';
-import { RecipientStatus } from '@opensignflow/database';
+import { RecipientRole, RecipientStatus } from '@opensignflow/database';
 
 export class RecipientEntity {
   @ApiProperty({ example: 'rcp_K9Ys4vF7gH6m2Qz2N8aBcD' })
@@ -18,6 +18,9 @@ export class RecipientEntity {
 
   @ApiProperty({ enum: RecipientStatus, example: RecipientStatus.PENDING })
   status!: RecipientStatus;
+
+  @ApiProperty({ enum: RecipientRole, example: RecipientRole.SIGNER })
+  role!: RecipientRole;
 
   @ApiProperty({ example: 1 })
   signingOrder!: number;
