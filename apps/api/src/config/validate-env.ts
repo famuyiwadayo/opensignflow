@@ -6,14 +6,22 @@ const envSchema = z.object({
     .default('development'),
   API_PORT: z.coerce.number().int().positive().default(4000),
   WEB_APP_URL: z.url().default('http://localhost:3000'),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required.'),
-  REDIS_URL: z.string().min(1).optional(),
+
+  DATABASE_URL: z.url('DATABASE_URL is required.'),
+  REDIS_URL: z.url('REDIS_URL must be a valid URL.'),
+
+  OUTBOX_ENCRYPTION_KEY: z
+    .string()
+    .min(1, 'OUTBOX_ENCRYPTION_KEY is required.'),
+  OUTBOX_ENCRYPTION_KEY_VERSION: z.string().min(1).default('1'),
+
   JWT_ACCESS_SECRET: z
     .string()
     .min(32)
     .default('dev-only-access-secret-change-me-before-production-32-chars'),
   ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
+
   S3_ENDPOINT: z.url().default('http://localhost:9000'),
   S3_REGION: z.string().min(1).default('us-east-1'),
   S3_BUCKET: z.string().min(1).default('opensignflow-documents'),
@@ -23,6 +31,16 @@ const envSchema = z.object({
 });
 
 export function validateEnv(config: Record<string, unknown>) {
+  console.log({
+    databaseUrlPresent: Boolean(config.DATABASE_URL),
+    redisUrlPresent: Boolean(config.REDIS_URL),
+    outboxEncryptionKeyPresent: Boolean(config.OUTBOX_ENCRYPTION_KEY),
+    outboxEncryptionKeyVersionPresent: Boolean(
+      config.OUTBOX_ENCRYPTION_KEY_VERSION,
+    ),
+    nodeEnv: config.NODE_ENV,
+  });
+
   const parsed = envSchema.safeParse(config);
 
   if (!parsed.success) {

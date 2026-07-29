@@ -9,6 +9,7 @@ import {
   AuditEventType,
   DocumentStatus,
   Prisma,
+  RecipientRole,
 } from '@opensignflow/database';
 
 import { AuditService } from '@/audit';
@@ -42,7 +43,7 @@ export class RecipientsService {
     const recipients = await this.recipientsRepository.listByDocumentId(
       input.documentId,
     );
-    return { data: recipients.map(RecipientEntity.fromPrisma) };
+    return { data: recipients.map((rcp) => RecipientEntity.fromPrisma(rcp)) };
   }
 
   async create(input: {
@@ -59,6 +60,7 @@ export class RecipientsService {
       name: input.dto.name.trim(),
       email: this.normalizeEmail(input.dto.email),
       signingOrder: input.dto.signingOrder ?? 1,
+      role: input.dto.role ?? RecipientRole.SIGNER,
     });
 
     await this.auditService.record({
@@ -90,11 +92,18 @@ export class RecipientsService {
   }): Promise<RecipientEntity> {
     const document = await this.getEditableDocument(input);
     const existing = await this.getRecipient(input.recipientId, document.id);
+    await this.assertRoleChangeIsAllowed({
+      documentId: document.id,
+      existingRole: existing.role,
+      requestedRole: input.dto.role,
+      recipientId: existing.id,
+    });
     const recipient = await this.updateRecipient({
       recipientId: existing.id,
       name: input.dto.name?.trim(),
       email: input.dto.email ? this.normalizeEmail(input.dto.email) : undefined,
       signingOrder: input.dto.signingOrder,
+      role: input.dto.role,
     });
 
     await this.auditService.record({
@@ -161,6 +170,35 @@ export class RecipientsService {
     return document;
   }
 
+  private async assertRoleChangeIsAllowed(input: {
+    documentId: string;
+    recipientId: string;
+    existingRole: RecipientRole;
+    requestedRole?: RecipientRole;
+  }) {
+    if (
+      input.existingRole !== RecipientRole.SIGNER ||
+      input.requestedRole !== RecipientRole.CC
+    ) {
+      return;
+    }
+
+    const assignedFieldCount =
+      await this.recipientsRepository.countFieldsForRecipient({
+        documentId: input.documentId,
+        recipientId: input.recipientId,
+      });
+
+    if (assignedFieldCount > 0) {
+      throw new UnprocessableEntityException(
+        apiError(
+          ErrorCode.RECIPIENT_ROLE_CHANGE_REQUIRES_FIELD_REASSIGNMENT,
+          "Reassign or remove this recipient's document fields before changing them from SIGNER to CC.",
+        ),
+      );
+    }
+  }
+
   private async getRecipient(recipientId: string, documentId: string) {
     const recipient = await this.recipientsRepository.findByIdForDocument({
       recipientId,
@@ -180,6 +218,7 @@ export class RecipientsService {
     name: string;
     email: string;
     signingOrder: number;
+    role: RecipientRole;
   }) {
     try {
       return await this.recipientsRepository.create(data);
@@ -193,6 +232,7 @@ export class RecipientsService {
     name?: string;
     email?: string;
     signingOrder?: number;
+    role?: RecipientRole;
   }) {
     try {
       return await this.recipientsRepository.update(data);

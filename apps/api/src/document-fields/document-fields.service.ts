@@ -3,7 +3,12 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-
+import {
+  AuditActorType,
+  AuditEventType,
+  DocumentStatus,
+  RecipientRole,
+} from '@opensignflow/database';
 import { AuditService } from '@/audit';
 import {
   apiError,
@@ -14,15 +19,13 @@ import {
 } from '@/common';
 import { DocumentsService } from '@/documents';
 import { RecipientsRepository } from '@/recipients';
-import { CreateDocumentFieldDto, UpdateDocumentFieldDto } from './dto';
-import { DocumentFieldEntity } from './entities';
-
-import { DocumentFieldsRepository } from './document-fields.repository';
 import {
-  AuditActorType,
-  AuditEventType,
-  DocumentStatus,
-} from '@opensignflow/database';
+  BulkAssignDocumentFieldsDto,
+  CreateDocumentFieldDto,
+  UpdateDocumentFieldDto,
+} from './dto';
+import { DocumentFieldEntity } from './entities';
+import { DocumentFieldsRepository } from './document-fields.repository';
 
 @Injectable()
 export class DocumentFieldsService {
@@ -33,7 +36,6 @@ export class DocumentFieldsService {
     private readonly auditService: AuditService,
     private readonly idGenerator: IdGeneratorService,
   ) {}
-
   async list(input: {
     user: AuthenticatedUser;
     organizationId?: string;
@@ -43,10 +45,9 @@ export class DocumentFieldsService {
     return {
       data: (
         await this.fieldsRepository.listByDocumentId(input.documentId)
-      ).map(DocumentFieldEntity.fromPrisma),
+      ).map((fld) => DocumentFieldEntity.fromPrisma(fld)),
     };
   }
-
   async create(input: {
     user: AuthenticatedUser;
     organizationId?: string;
@@ -80,7 +81,6 @@ export class DocumentFieldsService {
     );
     return DocumentFieldEntity.fromPrisma(field);
   }
-
   async update(input: {
     user: AuthenticatedUser;
     organizationId?: string;
@@ -113,7 +113,6 @@ export class DocumentFieldsService {
     );
     return DocumentFieldEntity.fromPrisma(field);
   }
-
   async remove(input: {
     user: AuthenticatedUser;
     organizationId?: string;
@@ -133,6 +132,64 @@ export class DocumentFieldsService {
     );
   }
 
+  async bulkAssign(input: {
+    user: AuthenticatedUser;
+    organizationId?: string;
+    documentId: string;
+    dto: BulkAssignDocumentFieldsDto;
+    context: RequestContext;
+  }) {
+    const document = await this.editable(input);
+    const recipient = await this.recipientsRepository.findByIdForDocument({
+      recipientId: input.dto.recipientId,
+      documentId: document.id,
+    });
+    if (!recipient)
+      throw new NotFoundException(
+        apiError(ErrorCode.RECIPIENT_NOT_FOUND, 'Recipient was not found.'),
+      );
+    if (recipient.role !== RecipientRole.SIGNER)
+      throw new UnprocessableEntityException(
+        apiError(
+          ErrorCode.RECIPIENT_ROLE_NOT_ELIGIBLE,
+          'Only signer recipients can be assigned document fields.',
+        ),
+      );
+    const fields = await this.fieldsRepository.listByIdsForDocument({
+      fieldIds: input.dto.fieldIds,
+      documentId: document.id,
+    });
+    if (fields.length !== input.dto.fieldIds.length)
+      throw new NotFoundException(
+        apiError(
+          ErrorCode.DOCUMENT_FIELD_NOT_FOUND,
+          'One or more document fields were not found.',
+        ),
+      );
+    const updated = await this.fieldsRepository.assignRecipient({
+      fieldIds: input.dto.fieldIds,
+      documentId: document.id,
+      recipientId: recipient.id,
+    });
+    await this.auditService.record({
+      organizationId: document.organizationId,
+      documentId: document.id,
+      actorUserId: input.user.id,
+      actorEmail: input.user.email,
+      actorType: AuditActorType.USER,
+      eventType: AuditEventType.DOCUMENT_FIELD_UPDATED,
+      context: input.context,
+      metadata: {
+        operation: 'BULK_ASSIGNMENT',
+        fieldIds: input.dto.fieldIds,
+        recipientId: recipient.id,
+      },
+    });
+    return {
+      data: updated.map((chng) => DocumentFieldEntity.fromPrisma(chng)),
+    };
+  }
+
   private async editable(input: {
     user: AuthenticatedUser;
     organizationId?: string;
@@ -148,7 +205,6 @@ export class DocumentFieldsService {
       );
     return document;
   }
-
   private async field(fieldId: string, documentId: string) {
     const field = await this.fieldsRepository.findByIdForDocument({
       fieldId,
@@ -163,7 +219,6 @@ export class DocumentFieldsService {
       );
     return field;
   }
-
   private async validate(
     field: {
       recipientId?: string;
@@ -191,6 +246,13 @@ export class DocumentFieldsService {
       throw new NotFoundException(
         apiError(ErrorCode.RECIPIENT_NOT_FOUND, 'Recipient was not found.'),
       );
+    if (recipient.role !== RecipientRole.SIGNER)
+      throw new UnprocessableEntityException(
+        apiError(
+          ErrorCode.RECIPIENT_ROLE_NOT_ELIGIBLE,
+          'Only signer recipients can be assigned document fields.',
+        ),
+      );
     if (pageCount && field.pageNumber > pageCount)
       throw new UnprocessableEntityException(
         apiError(
@@ -206,7 +268,6 @@ export class DocumentFieldsService {
         ),
       );
   }
-
   private write(dto: Partial<CreateDocumentFieldDto>) {
     return {
       recipientId: dto.recipientId,
@@ -222,7 +283,6 @@ export class DocumentFieldsService {
       defaultValue: dto.defaultValue,
     };
   }
-
   private audit(
     document: { id: string; organizationId: string },
     user: AuthenticatedUser,

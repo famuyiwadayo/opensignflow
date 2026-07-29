@@ -55,6 +55,25 @@ export class DocumentFieldsRepository {
     });
   }
 
+  listByIdsForDocument(input: { fieldIds: string[]; documentId: string }) {
+    return this.prisma.documentField.findMany({
+      where: { id: { in: input.fieldIds }, documentId: input.documentId },
+      select: documentFieldApiSelect,
+    });
+  }
+
+  async assignRecipient(input: {
+    fieldIds: string[];
+    documentId: string;
+    recipientId: string;
+  }) {
+    await this.prisma.documentField.updateMany({
+      where: { id: { in: input.fieldIds }, documentId: input.documentId },
+      data: { recipientId: input.recipientId },
+    });
+    return this.listByIdsForDocument(input);
+  }
+
   findByIdForDocument(input: { fieldId: string; documentId: string }) {
     return this.prisma.documentField.findFirst({
       where: { id: input.fieldId, documentId: input.documentId },

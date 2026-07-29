@@ -24,6 +24,7 @@
         "@nestjs/platform-express": "^11.0.1",
         "@nestjs/swagger": "^11.4.6",
         "@opensignflow/config": "workspace:*",
+        "@opensignflow/crypto": "workspace:*",
         "@opensignflow/database": "workspace:*",
         "@opensignflow/queue": "workspace:*",
         "@opensignflow/shared": "workspace:*",

@@ -189,6 +189,8 @@ Use `403` only when the caller is allowed to know the resource exists but lacks 
 | `RECIPIENT_REQUIRED` | 422 | At least one recipient is required |
 | `RECIPIENT_ALREADY_SIGNED` | 409 | Recipient has already signed |
 | `RECIPIENT_EMAIL_INVALID` | 422 | Recipient email is invalid |
+| `RECIPIENT_ROLE_NOT_ELIGIBLE` | 422 | Recipient role cannot perform the requested document action |
+| `RECIPIENT_ROLE_CHANGE_REQUIRES_FIELD_REASSIGNMENT` | 422 | Recipient has fields that must be reassigned or removed before role downgrade |
 
 ## Signing codes
 

@@ -6,6 +6,7 @@ export const recipientApiSelect = {
   name: true,
   email: true,
   status: true,
+  role: true,
   signingOrder: true,
   viewedAt: true,
   signedAt: true,

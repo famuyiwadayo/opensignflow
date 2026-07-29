@@ -23,6 +23,7 @@
     "db:push": "prisma db push"
   },
   "dependencies": {
+    "@opensignflow/crypto": "workspace:*",
     "@opensignflow/queue": "workspace:*",
     "@opensignflow/shared": "workspace:*",
     "@opensignflow/config": "workspace:*",

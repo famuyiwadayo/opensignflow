@@ -32,6 +32,11 @@ enum DocumentFieldType {
   CHECKBOX
 }
 
+enum RecipientRole {
+  SIGNER
+  CC
+}
+
 enum RecipientStatus {
   PENDING
   SENT
@@ -255,6 +260,7 @@ model Recipient {
   documentId   String          @map("document_id") @db.VarChar(40)
   name         String          @db.VarChar(120)
   email        String          @db.VarChar(320)
+  role         RecipientRole   @default(SIGNER)
   status       RecipientStatus @default(PENDING)
   signingOrder Int             @default(1) @map("signing_order")
   viewedAt     DateTime?       @map("viewed_at")
