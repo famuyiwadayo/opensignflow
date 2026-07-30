@@ -20,6 +20,10 @@ import {
 import { PrismaService } from '@/database';
 import { DocumentsService } from '@/documents';
 import { AuditService } from '@/audit';
+import {
+  OutboxPayloadEnvelope,
+  SendSigningEmailOutboxPayload,
+} from '@opensignflow/shared';
 
 @Injectable()
 export class SigningService {
@@ -96,6 +100,42 @@ export class SigningService {
       recipientName: recipient.name,
       signingToken: this.newToken(),
     }));
+
+    const outboxEvents = signingRequests.map((request) => {
+      const payload: OutboxPayloadEnvelope<
+        'SEND_SIGNING_EMAIL',
+        SendSigningEmailOutboxPayload
+      > = {
+        version: 1,
+        type: 'SEND_SIGNING_EMAIL',
+        payload: {
+          signingRequestId: request.id,
+          documentId: request.documentId,
+          recipientId: request.recipientId,
+          recipientEmail: request.recipientEmail,
+          recipientName: request.recipientName,
+          documentTitle: document.title,
+          signingToken: request.signingToken,
+        },
+      };
+      const encrypted = encryptPayload({
+        plaintext: JSON.stringify(payload),
+        base64Key: this.config.getOrThrow<string>('OUTBOX_ENCRYPTION_KEY'),
+        keyVersion: this.config.getOrThrow<string>(
+          'OUTBOX_ENCRYPTION_KEY_VERSION',
+        ),
+      });
+      return {
+        id: this.idGenerator.generate('outboxEvent'),
+        organizationId: document.organizationId,
+        type: 'SEND_SIGNING_EMAIL' as const,
+        resourceType: 'SIGNING_REQUEST',
+        resourceId: request.id,
+        encryptedPayload: JSON.stringify(encrypted),
+        encryptionKeyVersion: encrypted.keyVersion,
+      };
+    });
+
     await this.prisma.$transaction(async (tx) => {
       const transitioned = await tx.document.updateMany({
         where: {
@@ -105,6 +145,7 @@ export class SigningService {
         },
         data: { status: DocumentStatus.SENT, sentAt: now },
       });
+
       if (!transitioned.count)
         throw new UnprocessableEntityException(
           apiError(
@@ -112,6 +153,7 @@ export class SigningService {
             'Document has already been sent or is no longer a draft.',
           ),
         );
+
       await tx.recipient.updateMany({
         where: {
           documentId: document.id,
@@ -120,6 +162,7 @@ export class SigningService {
         },
         data: { status: RecipientStatus.SENT },
       });
+
       await tx.signingRequest.createMany({
         data: signingRequests.map((request) => ({
           id: request.id,
@@ -131,6 +174,7 @@ export class SigningService {
           sentAt: now,
         })),
       });
+
       await this.auditService.record(
         {
           organizationId: document.organizationId,
@@ -148,36 +192,25 @@ export class SigningService {
         },
         tx,
       );
+
       await tx.outboxEvent.createMany({
-        data: signingRequests.map((request) => {
-          const encrypted = encryptPayload({
-            plaintext: JSON.stringify({
-              ...request,
-              documentTitle: document.title,
-            }),
-            base64Key: this.config.getOrThrow<string>('OUTBOX_ENCRYPTION_KEY'),
-            keyVersion: this.config.getOrThrow<string>(
-              'OUTBOX_ENCRYPTION_KEY_VERSION',
-            ),
-          });
-          return {
-            id: this.idGenerator.generate('outboxEvent'),
-            organizationId: document.organizationId,
-            type: 'SEND_SIGNING_EMAIL',
-            resourceType: 'SIGNING_REQUEST',
-            resourceId: request.id,
-            encryptedPayload: JSON.stringify(encrypted),
-            encryptionKeyVersion: encrypted.keyVersion,
-          };
-        }),
+        data: outboxEvents,
       });
+
+      for (const event of outboxEvents) {
+        await tx.$executeRawUnsafe(
+          `SELECT pg_notify('opensignflow_outbox', '${event.id}')`,
+        );
+      }
     });
 
     return this.documentsService.getById(input);
   }
+
   private newToken() {
     return randomBytes(32).toString('base64url');
   }
+
   private hashToken(token: string) {
     return createHash('sha256').update(token).digest('hex');
   }

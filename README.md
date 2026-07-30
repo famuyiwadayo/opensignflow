@@ -1,5 +1,7 @@
 # OpenSignFlow
 
+See [Contributing Guide](CONTRIBUTING.md) for local setup, architectural boundaries, Prisma workflow, outbox rules, and pull-request expectations.
+
 OpenSignFlow is an open-source, AI-assisted PDF signing and document workflow platform for freelancers, small teams, agencies, and startups.
 
 The project is intentionally designed as both:
@@ -82,6 +84,11 @@ Start here:
 - [Error Codes](docs/error-codes.md)
 - [API Endpoint Matrix](docs/api-endpoint-matrix.md)
 - [Local Development](docs/local-development.md)
+- [Configuration and Dependency Readiness](docs/configuration-and-dependency-readiness.md)
+- [Signing, Delivery, and Token-Security Architecture](docs/signing-delivery-architecture.md)
+- [Transactional Outbox Pattern](docs/transactional-outbox.md)
+- [Database Workflow](docs/database-workflow.md)
+- [Documents Module](docs/documents-module.md)
 - [Data Model Draft](docs/data-model.md)
 - [Backend Standards](docs/backend-standards.md)
 - [Backend Core Implementation Notes](docs/backend-core-implementation.md)
@@ -101,3 +108,4 @@ Start here:
 ## Important legal note
 
 OpenSignFlow will provide signing workflows, PDF tooling, and audit trails. It should not initially claim to replace enterprise-grade e-signature, identity verification, or legal-compliance platforms. AI-generated summaries and risk hints are informational only and are not legal advice.
+- [Recipient, Field, and Signing Workflow](docs/recipient-field-and-signing-workflow.md)
