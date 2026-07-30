@@ -1,0 +1,30 @@
+{
+    "name": "@opensignflow/testkit",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "test": "echo 'No tests yet for @opensignflow/testkit'",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@opensignflow/config": "workspace:*",
+        "@testcontainers/postgresql": "^12.0.4",
+        "testcontainers": "^12.0.4"
+    },
+    "devDependencies": {
+        "@types/node": "^26.1.2",
+        "typescript": "^6.0.0"
+    }
+}
