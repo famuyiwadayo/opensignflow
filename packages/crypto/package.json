@@ -16,12 +16,28 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck": "tsc -p tsconfig.json --noEmit",
-        "test": "echo 'No tests yet for @opensignflow/crypto'",
+        "test": "jest",
         "clean": "rm -rf dist"
     },
     "devDependencies": {
+        "@types/jest": "^30.0.0",
         "@types/node": "^26.1.2",
         "eslint": "^10.8.0",
+        "jest": "^30.4.2",
+        "ts-jest": "^29.4.12",
         "typescript": "^7.0.2"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "rootDir": "src",
+        "testRegex": ".*\\.spec\\.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "testEnvironment": "node"
     }
 }
