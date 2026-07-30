@@ -1,5 +1,5 @@
-import type { PrismaService } from '@/database';
-import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@/database';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Prisma } from '@opensignflow/database';
 import { userAuthSelect, userPublicSelect } from './users.select';
 
@@ -15,7 +15,7 @@ export type CreateUserData = {
 
 @Injectable()
 export class UsersRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   create(data: CreateUserData, client: PrismaWriter = this.prisma) {
     return client.user.create({

@@ -1,23 +1,19 @@
 import { createHash, randomBytes } from 'node:crypto';
-import type { ConfigService } from '@nestjs/config';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { userPublicSelect } from '@/users';
-import type { PrismaService } from '@/database';
-import type {
-  IdGeneratorService,
-  RequestContext} from '@/common';
-import {
-  apiError,
-  ErrorCode
-} from '@/common';
+import { PrismaService } from '@/database';
+import { IdGeneratorService, type RequestContext } from '@/common';
+import { apiError, ErrorCode } from '@/common';
 
 @Injectable()
 export class RefreshSessionService {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
-    private readonly configService: ConfigService,
+    @Inject(ConfigService) private readonly configService: ConfigService,
   ) {}
 
   async create(userId: string, context: RequestContext) {

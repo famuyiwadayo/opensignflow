@@ -1,14 +1,10 @@
-import type { IdGeneratorService } from '@/common';
-import type { PrismaService } from '@/database';
-import { Injectable } from '@nestjs/common';
+import { IdGeneratorService } from '@/common';
+import { PrismaService } from '@/database';
+import { Inject, Injectable } from '@nestjs/common';
 
-import type {
-  OrganizationMembershipRecord} from './organizations.select';
-import {
-  organizationMembershipSelect,
-} from './organizations.select';
-import type {
-  Prisma} from '@opensignflow/database';
+import type { OrganizationMembershipRecord } from './organizations.select';
+import { organizationMembershipSelect } from './organizations.select';
+import type { Prisma } from '@opensignflow/database';
 import {
   OrganizationRole,
   PlanCode,
@@ -20,7 +16,8 @@ type PrismaWriter = PrismaService | Prisma.TransactionClient;
 @Injectable()
 export class OrganizationsRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
 

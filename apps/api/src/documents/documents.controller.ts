@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Headers,
+  Inject,
   Param,
   Post,
   Query,
@@ -22,7 +23,7 @@ import {
 import type { Request } from 'express';
 import { memoryStorage } from 'multer';
 
-import type { ListAuditEventsQueryDto} from '@/audit';
+import type { ListAuditEventsQueryDto } from '@/audit';
 import { AuditEventEntity } from '@/audit';
 import { JwtAuthGuard } from '@/auth/guards';
 import {
@@ -38,7 +39,7 @@ import type {
   ListDocumentsQueryDto,
 } from './dto';
 import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
-import type { DocumentsService} from './documents.service';
+import { DocumentsService } from './documents.service';
 import type { UploadedPdfFile } from './documents.service';
 
 @ApiTags('documents')
@@ -46,7 +47,10 @@ import type { UploadedPdfFile } from './documents.service';
 @UseGuards(JwtAuthGuard)
 @Controller('v1/documents')
 export class DocumentsController {
-  constructor(private readonly documentsService: DocumentsService) {}
+  constructor(
+    @Inject(DocumentsService)
+    private readonly documentsService: DocumentsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List documents for the active organization' })

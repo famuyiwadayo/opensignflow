@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import type { OrganizationsService } from './organizations.service';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { OrganizationsService } from './organizations.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/guards';
 import {
@@ -14,7 +14,10 @@ import { OrganizationMembershipEntity } from './entities';
 @UseGuards(JwtAuthGuard)
 @Controller('v1/organizations')
 export class OrganizationsController {
-  constructor(private readonly orgService: OrganizationsService) {}
+  constructor(
+    @Inject(OrganizationsService)
+    private readonly orgService: OrganizationsService,
+  ) {}
 
   @Get()
   @ApiOperation({

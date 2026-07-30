@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import type { RecipientRole } from '@opensignflow/database';
 
-import type { PrismaService } from '@/database';
-import type { RecipientApiRecord} from './recipients.select';
+import { PrismaService } from '@/database';
+import type { RecipientApiRecord } from './recipients.select';
 import { recipientApiSelect } from './recipients.select';
 
 @Injectable()
 export class RecipientsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   listByDocumentId(documentId: string): Promise<RecipientApiRecord[]> {
     return this.prisma.recipient.findMany({

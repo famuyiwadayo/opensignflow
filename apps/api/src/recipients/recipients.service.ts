@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -12,26 +13,28 @@ import {
   RecipientRole,
 } from '@opensignflow/database';
 
-import type { AuditService } from '@/audit';
-import type {
-  IdGeneratorService} from '@/common';
+import { AuditService } from '@/audit';
+import { IdGeneratorService } from '@/common';
 import {
   apiError,
   ErrorCode,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import type { DocumentsService } from '@/documents';
+import { DocumentsService } from '@/documents';
 import type { CreateRecipientDto, UpdateRecipientDto } from './dto';
 import { RecipientEntity } from './entities';
-import type { RecipientsRepository } from './recipients.repository';
+import { RecipientsRepository } from './recipients.repository';
 
 @Injectable()
 export class RecipientsService {
   constructor(
+    @Inject(DocumentsService)
     private readonly documentsService: DocumentsService,
+    @Inject(RecipientsRepository)
     private readonly recipientsRepository: RecipientsRepository,
-    private readonly auditService: AuditService,
+    @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
 

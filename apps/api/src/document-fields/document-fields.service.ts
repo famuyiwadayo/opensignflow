@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -9,32 +10,35 @@ import {
   DocumentStatus,
   RecipientRole,
 } from '@opensignflow/database';
-import type { AuditService } from '@/audit';
-import type {
-  IdGeneratorService} from '@/common';
+import { AuditService } from '@/audit';
+import { IdGeneratorService } from '@/common';
 import {
   apiError,
   ErrorCode,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import type { DocumentsService } from '@/documents';
-import type { RecipientsRepository } from '@/recipients';
+import { DocumentsService } from '@/documents';
+import { RecipientsRepository } from '@/recipients';
 import type {
   BulkAssignDocumentFieldsDto,
   CreateDocumentFieldDto,
   UpdateDocumentFieldDto,
 } from './dto';
 import { DocumentFieldEntity } from './entities';
-import type { DocumentFieldsRepository } from './document-fields.repository';
+import { DocumentFieldsRepository } from './document-fields.repository';
 
 @Injectable()
 export class DocumentFieldsService {
   constructor(
+    @Inject(DocumentsService)
     private readonly documentsService: DocumentsService,
+    @Inject(RecipientsRepository)
     private readonly recipientsRepository: RecipientsRepository,
+    @Inject(DocumentFieldsRepository)
     private readonly fieldsRepository: DocumentFieldsRepository,
-    private readonly auditService: AuditService,
+    @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
   async list(input: {
@@ -145,28 +149,31 @@ export class DocumentFieldsService {
       recipientId: input.dto.recipientId,
       documentId: document.id,
     });
-    if (!recipient)
-      {throw new NotFoundException(
+    if (!recipient) {
+      throw new NotFoundException(
         apiError(ErrorCode.RECIPIENT_NOT_FOUND, 'Recipient was not found.'),
-      );}
-    if (recipient.role !== RecipientRole.SIGNER)
-      {throw new UnprocessableEntityException(
+      );
+    }
+    if (recipient.role !== RecipientRole.SIGNER) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.RECIPIENT_ROLE_NOT_ELIGIBLE,
           'Only signer recipients can be assigned document fields.',
         ),
-      );}
+      );
+    }
     const fields = await this.fieldsRepository.listByIdsForDocument({
       fieldIds: input.dto.fieldIds,
       documentId: document.id,
     });
-    if (fields.length !== input.dto.fieldIds.length)
-      {throw new NotFoundException(
+    if (fields.length !== input.dto.fieldIds.length) {
+      throw new NotFoundException(
         apiError(
           ErrorCode.DOCUMENT_FIELD_NOT_FOUND,
           'One or more document fields were not found.',
         ),
-      );}
+      );
+    }
     const updated = await this.fieldsRepository.assignRecipient({
       fieldIds: input.dto.fieldIds,
       documentId: document.id,
@@ -197,13 +204,14 @@ export class DocumentFieldsService {
     documentId: string;
   }) {
     const document = await this.documentsService.getById(input);
-    if (document.status !== DocumentStatus.DRAFT)
-      {throw new UnprocessableEntityException(
+    if (document.status !== DocumentStatus.DRAFT) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_NOT_EDITABLE,
           'Fields can only be changed while a document is a draft.',
         ),
-      );}
+      );
+    }
     return document;
   }
   private async field(fieldId: string, documentId: string) {
@@ -211,13 +219,14 @@ export class DocumentFieldsService {
       fieldId,
       documentId,
     });
-    if (!field)
-      {throw new NotFoundException(
+    if (!field) {
+      throw new NotFoundException(
         apiError(
           ErrorCode.DOCUMENT_FIELD_NOT_FOUND,
           'Document field was not found.',
         ),
-      );}
+      );
+    }
     return field;
   }
   private async validate(
@@ -232,42 +241,47 @@ export class DocumentFieldsService {
     documentId: string,
     pageCount: number | null,
   ) {
-    if (!field.recipientId)
-      {throw new UnprocessableEntityException(
+    if (!field.recipientId) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_FIELD_RECIPIENT_REQUIRED,
           'A recipient is required for every document field.',
         ),
-      );}
+      );
+    }
     const recipient = await this.recipientsRepository.findByIdForDocument({
       recipientId: field.recipientId,
       documentId,
     });
-    if (!recipient)
-      {throw new NotFoundException(
+    if (!recipient) {
+      throw new NotFoundException(
         apiError(ErrorCode.RECIPIENT_NOT_FOUND, 'Recipient was not found.'),
-      );}
-    if (recipient.role !== RecipientRole.SIGNER)
-      {throw new UnprocessableEntityException(
+      );
+    }
+    if (recipient.role !== RecipientRole.SIGNER) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.RECIPIENT_ROLE_NOT_ELIGIBLE,
           'Only signer recipients can be assigned document fields.',
         ),
-      );}
-    if (pageCount && field.pageNumber > pageCount)
-      {throw new UnprocessableEntityException(
+      );
+    }
+    if (pageCount && field.pageNumber > pageCount) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_FIELD_INVALID_POSITION,
           'Page number is outside the document.',
         ),
-      );}
-    if (field.x + field.width > 1 || field.y + field.height > 1)
-      {throw new UnprocessableEntityException(
+      );
+    }
+    if (field.x + field.width > 1 || field.y + field.height > 1) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_FIELD_INVALID_POSITION,
           'Field bounds must remain within the page.',
         ),
-      );}
+      );
+    }
   }
   private write(dto: Partial<CreateDocumentFieldDto>) {
     return {

@@ -1,19 +1,16 @@
-import type {
-  CanActivate,
-  ExecutionContext} from '@nestjs/common';
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type { Request } from 'express';
 
-import type { AuthenticatedRequest} from '@/common';
+import type { AuthenticatedRequest } from '@/common';
 import { apiError, ErrorCode } from '@/common';
-import type { TokenService } from '../../auth/token.service';
+import { TokenService } from '../../auth/token.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly tokenService: TokenService) {}
+  constructor(
+    @Inject(TokenService) private readonly tokenService: TokenService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context

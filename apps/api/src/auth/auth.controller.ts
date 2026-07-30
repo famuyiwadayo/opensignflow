@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Inject,
   Post,
   Req,
   Res,
@@ -23,7 +24,7 @@ import {
 } from '@/common';
 import { JwtAuthGuard } from './guards';
 import type { AuthenticatedUser, RequestContext } from '@/common';
-import type { AuthService } from './auth.service';
+import { AuthService } from './auth.service';
 import type { LoginDto, RegisterDto } from './dto';
 import { AuthResponseDto, MeResponseDto } from './dto';
 
@@ -32,7 +33,7 @@ const REFRESH_COOKIE_NAME = 'opensignflow_refresh_token';
 @ApiTags('auth')
 @Controller('v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('register')
   @ApiOperation({

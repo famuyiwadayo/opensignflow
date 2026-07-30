@@ -1,5 +1,5 @@
-import type { PrismaService } from '@/database';
-import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@/database';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Prisma } from '@opensignflow/database';
 import type { DocumentStatus } from '@opensignflow/database';
 import { documentApiSelect, documentStorageSelect } from './documents.select';
@@ -28,7 +28,7 @@ export type ListDocumentsInput = {
 
 @Injectable()
 export class DocumentsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   create(data: CreateDocumentData, client: PrismaWriter = this.prisma) {
     return client.document.create({ data, select: documentApiSelect });

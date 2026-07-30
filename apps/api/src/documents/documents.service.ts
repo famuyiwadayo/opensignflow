@@ -4,25 +4,25 @@ import {
   PayloadTooLargeException,
   UnsupportedMediaTypeException,
   UnprocessableEntityException,
+  Inject,
 } from '@nestjs/common';
 
-import type { AuditService} from '@/audit';
+import { AuditService } from '@/audit';
 import type { ListAuditEventsQueryDto } from '@/audit';
-import type {
-  IdGeneratorService} from '@/common';
+import { IdGeneratorService } from '@/common';
 import {
   apiError,
   ErrorCode,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import type { OrganizationsService } from '@/organizations';
-import type { PdfService } from '@/pdf';
-import type { StorageService } from '@/storage';
+import { OrganizationsService } from '@/organizations';
+import { PdfService } from '@/pdf';
+import { StorageService } from '@/storage';
 import type { CreateDocumentDto, ListDocumentsQueryDto } from './dto';
-import type { DocumentDownloadUrlEntity} from './entities';
+import type { DocumentDownloadUrlEntity } from './entities';
 import { DocumentEntity } from './entities';
-import type { DocumentsRepository } from './documents.repository';
+import { DocumentsRepository } from './documents.repository';
 import { AuditActorType, AuditEventType } from '@opensignflow/database';
 
 const MAX_PDF_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -37,11 +37,14 @@ export type UploadedPdfFile = {
 @Injectable()
 export class DocumentsService {
   constructor(
+    @Inject(DocumentsRepository)
     private readonly documentsRepository: DocumentsRepository,
+    @Inject(OrganizationsService)
     private readonly organizationsService: OrganizationsService,
-    private readonly storageService: StorageService,
-    private readonly pdfService: PdfService,
-    private readonly auditService: AuditService,
+    @Inject(StorageService) private readonly storageService: StorageService,
+    @Inject(PdfService) private readonly pdfService: PdfService,
+    @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
 

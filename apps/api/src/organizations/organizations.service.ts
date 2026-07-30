@@ -1,15 +1,19 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { apiError, ErrorCode } from '@/common';
-import type { OrganizationsRepository } from './organizations.repository';
+import { OrganizationsRepository } from './organizations.repository';
 
 @Injectable()
 export class OrganizationsService {
-  constructor(private readonly orgRepo: OrganizationsRepository) {}
+  constructor(
+    @Inject(OrganizationsRepository)
+    private readonly orgRepo: OrganizationsRepository,
+  ) {}
 
   createPersonalWorkspaceName(input: {
     name?: string | null;

@@ -1,8 +1,12 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import {
+  Inject,
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { apiError, ErrorCode } from '@/common';
 import type { CreateSignedUrlInput, UploadObjectInput } from './storage.types';
@@ -12,7 +16,9 @@ export class StorageService {
   private readonly client: S3Client;
   private readonly bucket: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    @Inject(ConfigService) private readonly configService: ConfigService,
+  ) {
     this.bucket = this.requiredConfig('S3_BUCKET');
 
     this.client = new S3Client({

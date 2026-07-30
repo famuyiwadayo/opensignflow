@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import type { PrismaService } from '@/database';
-import type { AuditEventApiRecord} from './audit.select';
+import { PrismaService } from '@/database';
+import type { AuditEventApiRecord } from './audit.select';
 import { auditEventApiSelect } from './audit.select';
 
 @Injectable()
 export class AuditRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   listForDocument(input: {
     organizationId: string;
