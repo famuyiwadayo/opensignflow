@@ -45,11 +45,14 @@ opensignflow/
   apps/
     web/
     api/
+    worker/
   packages/
     shared/
     database/
-    api-client/
+    queue/
+    crypto/
     config/
+    api-client/
   docs/
   docker-compose.yml
   turbo.json
@@ -113,12 +116,14 @@ The frontend should depend on this package instead of scattering raw `fetch` cal
 
 ### `packages/database`
 
-This can be introduced when the schema stabilizes. For the earliest MVP, Prisma can live inside `apps/api` to reduce setup complexity. Later, the database package can own:
+The database package owns:
 
-- Prisma schema;
-- generated Prisma client wrapper;
-- seed scripts;
-- shared database types.
+- Prisma 7 schema and migrations;
+- generated Prisma client output;
+- PostgreSQL driver-adapter client construction;
+- persistence enums and Prisma types.
+
+Both API and worker create independent process-local database clients from this package. Applications do not import generated Prisma paths directly.
 
 ## Backend modules
 
@@ -191,15 +196,16 @@ Suggested low-cost production setup:
 - Rate-limit public endpoints.
 - Keep all timestamps in UTC ISO 8601 format.
 
-## Initial scalability decision
+## Worker and scalability decision
 
-For MVP, background job processors may live inside `apps/api`.
-
-Later, split them into:
+Background work runs in the dedicated `apps/worker` process. API replicas are request-serving infrastructure and may sit behind an Ingress/load balancer; worker replicas are competing consumers and do not require a public service.
 
 ```txt
 apps/api
+  HTTP API, business transactions, encrypted outbox writes
+
 apps/worker
+  outbox dispatch, BullMQ processing, email/PDF/AI capability handlers
 ```
 
-when PDF/AI processing becomes heavy enough to justify independent scaling.
+Workers scale horizontally through PostgreSQL conditional outbox claims and BullMQ consumer distribution. PostgreSQL LISTEN/NOTIFY is the planned low-latency wake-up mechanism; periodic safety sweeps and lease recovery preserve durability. See [Transactional Outbox Pattern](./transactional-outbox.md).
