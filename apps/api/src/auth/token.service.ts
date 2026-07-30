@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import type { ConfigService } from '@nestjs/config';
+import type { JwtService } from '@nestjs/jwt';
 
 import { apiError, ErrorCode } from '@/common';
-import { AccessTokenPayload } from './entities';
+import type { AccessTokenPayload } from './entities';
 
 type AccessTokenInput = {
   sub: string;

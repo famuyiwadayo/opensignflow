@@ -28,7 +28,7 @@ async function bootstrap() {
 
 function requiredRedisUrl(): string {
   const value = process.env.REDIS_URL;
-  if (!value) throw new Error('Worker startup blocked: REDIS_URL is required.');
+  if (!value) {throw new Error('Worker startup blocked: REDIS_URL is required.');}
   new URL(value);
   return value;
 }

@@ -16,7 +16,7 @@ export function findWorkspaceRoot(workingDirectory = process.cwd()): string {
     const packagePath = join(directory, 'package.json');
     if (existsSync(packagePath)) {
       const packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as { workspaces?: unknown };
-      if (Array.isArray(packageJson.workspaces)) return directory;
+      if (Array.isArray(packageJson.workspaces)) {return directory;}
     }
 
     const parent = resolve(directory, '..');
@@ -39,7 +39,7 @@ export function loadRepositoryEnvironment(input: LoadRepositoryEnvironmentInput 
   if (nodeEnv === 'development') {
     const result = loadDotenv({ path: envFilePath, override: true });
     if (result.error && (result.error as NodeJS.ErrnoException).code !== 'ENOENT')
-      throw result.error;
+      {throw result.error;}
   }
 
   return { workspaceRoot, envFilePath };

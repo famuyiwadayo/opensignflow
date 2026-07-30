@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/database';
-import { AuditEventApiRecord, auditEventApiSelect } from './audit.select';
+import type { PrismaService } from '@/database';
+import type { AuditEventApiRecord} from './audit.select';
+import { auditEventApiSelect } from './audit.select';
 
 @Injectable()
 export class AuditRepository {

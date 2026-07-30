@@ -9,18 +9,11 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
-    "lint": "eslint \"src/**/*.ts\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "jest",
-    "clean": "rm -rf dist coverage",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev --name dev",
-    "db:studio": "prisma studio",
-    "db:deploy": "prisma migrate deploy",
-    "db:reset": "prisma migrate reset --force",
-    "db:migrate:create": "prisma migrate dev --create-only --name",
-    "db:status": "prisma migrate status",
-    "db:push": "prisma db push"
+    "clean": "rm -rf dist coverage"
   },
   "dependencies": {
     "@opensignflow/crypto": "workspace:*",
@@ -56,8 +49,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.0.1",
@@ -70,8 +61,6 @@
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.0.0",
     "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
     "globals": "^17.0.0",
     "jest": "^30.0.0",
     "prettier": "^3.4.2",
@@ -82,8 +71,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^6",
-    "typescript-eslint": "^8.65.0"
+    "typescript": "^6"
   },
   "jest": {
     "moduleFileExtensions": [

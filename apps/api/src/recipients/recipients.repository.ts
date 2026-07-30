@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { RecipientRole } from '@opensignflow/database';
+import type { RecipientRole } from '@opensignflow/database';
 
-import { PrismaService } from '@/database';
-import { RecipientApiRecord, recipientApiSelect } from './recipients.select';
+import type { PrismaService } from '@/database';
+import type { RecipientApiRecord} from './recipients.select';
+import { recipientApiSelect } from './recipients.select';
 
 @Injectable()
 export class RecipientsRepository {

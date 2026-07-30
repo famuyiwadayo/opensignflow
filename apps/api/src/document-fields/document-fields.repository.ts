@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/database';
+import type { PrismaService } from '@/database';
 import { documentFieldApiSelect } from './document-fields.select';
-import { Prisma } from '@opensignflow/database';
+import type { Prisma } from '@opensignflow/database';
 
 export type DocumentFieldWriteData = {
   id?: string;

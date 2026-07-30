@@ -27,9 +27,9 @@ import {
   CurrentUser,
   type AuthenticatedUser,
 } from '@/common';
-import { CreateRecipientDto, UpdateRecipientDto } from './dto';
+import type { CreateRecipientDto, UpdateRecipientDto } from './dto';
 import { RecipientEntity } from './entities';
-import { RecipientsService } from './recipients.service';
+import type { RecipientsService } from './recipients.service';
 
 @ApiTags('recipients')
 @ApiBearerAuth()

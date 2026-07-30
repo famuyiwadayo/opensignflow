@@ -15,7 +15,7 @@ import {
   type AuthenticatedUser,
 } from '@/common';
 import { DocumentEntity } from '@/documents';
-import { SigningService } from './signing.service';
+import type { SigningService } from './signing.service';
 
 @ApiTags('signing')
 @ApiBearerAuth()

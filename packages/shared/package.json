@@ -14,7 +14,8 @@
   "scripts": {
     "dev": "tsc --watch --preserveWatchOutput",
     "build": "tsc -p tsconfig.json",
-    "lint": "eslint \"src/**/*.ts\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "echo 'No tests yet for @opensignflow/shared'",
     "clean": "rm -rf dist"
@@ -22,8 +23,6 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.7.0",
-    "eslint-config-next": "^16.2.11",
-    "globals": "^17.7.0",
-    "typescript-eslint": "^8.65.0"
+    "globals": "^17.7.0"
   }
 }

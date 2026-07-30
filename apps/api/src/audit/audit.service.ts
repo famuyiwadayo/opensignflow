@@ -1,16 +1,17 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 
+import type {
+  IdGeneratorService} from '@/common';
 import {
   apiError,
   ErrorCode,
-  IdGeneratorService,
   type RequestContext,
 } from '@/common';
-import { PrismaService } from '@/database';
-import { ListAuditEventsQueryDto } from './dto';
+import type { PrismaService } from '@/database';
+import type { ListAuditEventsQueryDto } from './dto';
 import { AuditEventEntity } from './entities';
-import { AuditRepository } from './audit.repository';
-import { AuditActorType, AuditEventType, Prisma } from '@opensignflow/database';
+import type { AuditRepository } from './audit.repository';
+import type { AuditActorType, AuditEventType, Prisma } from '@opensignflow/database';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;
 
@@ -91,7 +92,7 @@ export class AuditService {
       const parsed = JSON.parse(
         Buffer.from(cursor, 'base64url').toString('utf8'),
       ) as { id?: string };
-      if (!parsed.id) throw new Error('Missing cursor id.');
+      if (!parsed.id) {throw new Error('Missing cursor id.');}
       return parsed.id;
     } catch {
       throw new UnprocessableEntityException(

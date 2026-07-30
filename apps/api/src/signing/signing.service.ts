@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { encryptPayload } from '@opensignflow/crypto';
 import {
   AuditActorType,
@@ -10,17 +10,18 @@ import {
   RecipientStatus,
   SigningRequestStatus,
 } from '@opensignflow/database';
+import type {
+  IdGeneratorService} from '@/common';
 import {
   apiError,
   ErrorCode,
-  IdGeneratorService,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import { PrismaService } from '@/database';
-import { DocumentsService } from '@/documents';
-import { AuditService } from '@/audit';
-import {
+import type { PrismaService } from '@/database';
+import type { DocumentsService } from '@/documents';
+import type { AuditService } from '@/audit';
+import type {
   OutboxPayloadEnvelope,
   SendSigningEmailOutboxPayload,
 } from '@opensignflow/shared';
@@ -43,12 +44,12 @@ export class SigningService {
   }) {
     const document = await this.documentsService.getById(input);
     if (document.status !== DocumentStatus.DRAFT)
-      throw new UnprocessableEntityException(
+      {throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_ALREADY_SENT,
           'Document has already been sent or is no longer a draft.',
         ),
-      );
+      );}
     const recipients = await this.prisma.recipient.findMany({
       where: { documentId: document.id },
       select: { id: true, email: true, name: true, role: true },
@@ -65,32 +66,32 @@ export class SigningService {
       !fields.length ||
       fields.some((field) => !field.recipientId)
     )
-      throw new UnprocessableEntityException(
+      {throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'A document needs at least one signer and one assigned field before it can be sent.',
         ),
-      );
+      );}
     const signerIds = new Set(signers.map((recipient) => recipient.id));
     if (
       fields.some(
         (field) => !field.recipientId || !signerIds.has(field.recipientId),
       )
     )
-      throw new UnprocessableEntityException(
+      {throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'Every field must be assigned to a signer recipient.',
         ),
-      );
+      );}
     const assignedSignerIds = new Set(fields.map((field) => field.recipientId));
     if (signers.some((signer) => !assignedSignerIds.has(signer.id)))
-      throw new UnprocessableEntityException(
+      {throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'Every signer must have at least one assigned field before the document can be sent.',
         ),
-      );
+      );}
     const now = new Date();
     const signingRequests = signers.map((recipient) => ({
       id: this.idGenerator.generate('signingRequest'),
@@ -147,12 +148,12 @@ export class SigningService {
       });
 
       if (!transitioned.count)
-        throw new UnprocessableEntityException(
+        {throw new UnprocessableEntityException(
           apiError(
             ErrorCode.DOCUMENT_ALREADY_SENT,
             'Document has already been sent or is no longer a draft.',
           ),
-        );
+        );}
 
       await tx.recipient.updateMany({
         where: {

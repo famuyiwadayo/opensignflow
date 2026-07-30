@@ -2,6 +2,7 @@
   "name": "opensignflow",
   "version": "1.0.0",
   "description": "",
+  "types": "module",
   "main": "index.js",
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
@@ -32,12 +34,19 @@
     "db:reset": "turbo db:reset",
     "db:migrate:create": "turbo db:migrate:create --",
     "db:status": "turbo db:status",
-    "db:push": "turbo db:push"
+    "db:push": "turbo db:push",
+    "generate": "bun run db:generate",
+    "check": "bun run generate && bun run lint && bun run typecheck",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "eslint": "^10.7.0",
+    "globals": "^17.8.0",
+    "husky": "^9.1.7",
     "prettier": "^3.9.6",
     "turbo": "^2.10.6",
-    "typescript": "^7.0.2"
+    "typescript": "^6",
+    "typescript-eslint": "^8.65.0"
   }
 }

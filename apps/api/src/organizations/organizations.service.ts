@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { apiError, ErrorCode, IdGeneratorService } from '@/common';
-import { OrganizationsRepository } from './organizations.repository';
+import { apiError, ErrorCode } from '@/common';
+import type { OrganizationsRepository } from './organizations.repository';
 
 @Injectable()
 export class OrganizationsService {

@@ -85,6 +85,7 @@ Start here:
 - [API Endpoint Matrix](docs/api-endpoint-matrix.md)
 - [Local Development](docs/local-development.md)
 - [Configuration and Dependency Readiness](docs/configuration-and-dependency-readiness.md)
+- [Quality Gates](docs/quality-gates.md)
 - [Signing, Delivery, and Token-Security Architecture](docs/signing-delivery-architecture.md)
 - [Transactional Outbox Pattern](docs/transactional-outbox.md)
 - [Database Workflow](docs/database-workflow.md)
