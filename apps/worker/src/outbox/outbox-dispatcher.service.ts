@@ -1,9 +1,10 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { decryptPayload, type EncryptedPayload } from '@opensignflow/crypto';
 import { OutboxEventStatus } from '@opensignflow/database';
 import { Client } from 'pg';
-import { WorkerPrismaService } from '../database/worker-prisma.service';
-import { OutboxHandlerRegistry } from './outbox-handler.registry';
+import type { WorkerPrismaService } from '../database/worker-prisma.service';
+import type { OutboxHandlerRegistry } from './outbox-handler.registry';
 
 const SAFETY_SWEEP_MS = 60_000;
 const LEASE_MS = 5 * 60_000;
@@ -31,7 +32,7 @@ export class OutboxDispatcherService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    if (this.timer) clearInterval(this.timer);
+    if (this.timer) {clearInterval(this.timer);}
     await this.listener?.end();
   }
 
@@ -41,7 +42,7 @@ export class OutboxDispatcherService implements OnModuleInit, OnModuleDestroy {
     await this.listener.query('LISTEN opensignflow_outbox');
     this.listener.on('notification', (message) => {
       if (message.channel === 'opensignflow_outbox')
-        void this.dispatchSafely(message.payload || undefined);
+        {void this.dispatchSafely(message.payload || undefined);}
     });
     this.listener.on('error', (error) =>
       this.logger.error('Outbox LISTEN connection failed.', error.stack),
@@ -49,7 +50,7 @@ export class OutboxDispatcherService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async dispatchSafely(eventId?: string) {
-    if (this.dispatching) return;
+    if (this.dispatching) {return;}
     this.dispatching = true;
     try {
       await this.recoverExpiredLeases();
@@ -89,11 +90,11 @@ export class OutboxDispatcherService implements OnModuleInit, OnModuleDestroy {
           attemptCount: { increment: 1 },
         },
       });
-      if (!claimed.count) continue;
+      if (!claimed.count) {continue;}
 
       try {
         const handler = this.handlers.get(event.type);
-        if (!handler) throw new Error(`No outbox handler is registered for ${event.type}.`);
+        if (!handler) {throw new Error(`No outbox handler is registered for ${event.type}.`);}
 
         const decryptedPayload = decryptPayload({
           ...(JSON.parse(event.encryptedPayload) as EncryptedPayload),
@@ -135,6 +136,6 @@ export class OutboxDispatcherService implements OnModuleInit, OnModuleDestroy {
 
 function required(name: string) {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} is required.`);
+  if (!value) {throw new Error(`${name} is required.`);}
   return value;
 }

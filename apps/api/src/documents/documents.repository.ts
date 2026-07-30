@@ -1,7 +1,7 @@
-import { PrismaService } from '@/database';
+import type { PrismaService } from '@/database';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@opensignflow/database';
-import { DocumentStatus } from '@opensignflow/database';
+import type { Prisma } from '@opensignflow/database';
+import type { DocumentStatus } from '@opensignflow/database';
 import { documentApiSelect, documentStorageSelect } from './documents.select';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;

@@ -26,14 +26,28 @@ bun run dev
 bun run dev:worker
 ```
 
-Run checks before opening a pull request:
+Run the canonical quality gate before opening a pull request:
 
 ```bash
-bun run typecheck
-bun run lint
+bun run check
+```
+
+It performs:
+
+```txt
+Prisma client generation
+full monorepo lint
+full monorepo typecheck
+```
+
+Then run tests and build when applicable:
+
+```bash
 bun run test
 bun run build
 ```
+
+A Husky pre-push hook runs `bun run check` automatically. Do not bypass it with `--no-verify` unless diagnosing a hook/tooling failure; document any temporary bypass in the related issue or pull request.
 
 ## Read these documents first
 

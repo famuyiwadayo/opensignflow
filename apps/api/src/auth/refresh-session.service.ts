@@ -1,14 +1,15 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { userPublicSelect } from '@/users';
-import { PrismaService } from '@/database';
+import type { PrismaService } from '@/database';
+import type {
+  IdGeneratorService,
+  RequestContext} from '@/common';
 import {
   apiError,
-  ErrorCode,
-  IdGeneratorService,
-  RequestContext,
+  ErrorCode
 } from '@/common';
 
 @Injectable()

@@ -6,20 +6,23 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 
-import { AuditService, type ListAuditEventsQueryDto } from '@/audit';
+import type { AuditService} from '@/audit';
+import type { ListAuditEventsQueryDto } from '@/audit';
+import type {
+  IdGeneratorService} from '@/common';
 import {
   apiError,
   ErrorCode,
-  IdGeneratorService,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import { OrganizationsService } from '@/organizations';
-import { PdfService } from '@/pdf';
-import { StorageService } from '@/storage';
+import type { OrganizationsService } from '@/organizations';
+import type { PdfService } from '@/pdf';
+import type { StorageService } from '@/storage';
 import type { CreateDocumentDto, ListDocumentsQueryDto } from './dto';
-import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
-import { DocumentsRepository } from './documents.repository';
+import type { DocumentDownloadUrlEntity} from './entities';
+import { DocumentEntity } from './entities';
+import type { DocumentsRepository } from './documents.repository';
 import { AuditActorType, AuditEventType } from '@opensignflow/database';
 
 const MAX_PDF_FILE_SIZE_BYTES = 10 * 1024 * 1024;

@@ -46,7 +46,7 @@ export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigning
           !payload[field as keyof typeof payload],
       )
     )
-      throw new Error('Invalid SEND_SIGNING_EMAIL outbox payload.');
+      {throw new Error('Invalid SEND_SIGNING_EMAIL outbox payload.');}
     return payload;
   }
 
@@ -61,6 +61,6 @@ export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigning
 
 function required(name: string) {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} is required.`);
+  if (!value) {throw new Error(`${name} is required.`);}
   return value;
 }

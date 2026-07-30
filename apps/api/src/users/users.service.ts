@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UsersRepository } from './users.repository';
-import { apiError, ErrorCode, IdGeneratorService } from '@/common';
+import type { UsersRepository } from './users.repository';
+import type { IdGeneratorService } from '@/common';
+import { apiError, ErrorCode } from '@/common';
 
 @Injectable()
 export class UsersService {

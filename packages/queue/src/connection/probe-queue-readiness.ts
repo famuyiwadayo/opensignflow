@@ -36,7 +36,7 @@ export async function probeQueueReadiness(input: {
       reason: error instanceof Error ? error.message : 'Unknown Redis readiness failure.',
     };
   } finally {
-    if (timeout) clearTimeout(timeout);
+    if (timeout) {clearTimeout(timeout);}
     connection.disconnect();
   }
 }

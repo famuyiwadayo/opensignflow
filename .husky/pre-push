@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Keep local push quality gates identical to the root CI quality command.
+bun run check

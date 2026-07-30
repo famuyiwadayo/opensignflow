@@ -1,5 +1,6 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 import { probeQueueReadiness, type QueueReadiness } from '@opensignflow/queue';
 
 @Injectable()
@@ -17,7 +18,7 @@ export class QueueReadinessService implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleDestroy() {
-    if (this.timer) clearInterval(this.timer);
+    if (this.timer) {clearInterval(this.timer);}
   }
 
   getStatus(): QueueReadiness {
@@ -33,8 +34,8 @@ export class QueueReadinessService implements OnModuleInit, OnModuleDestroy {
     this.readiness = next;
     if (changed) {
       const message = `Redis queue dependency is ${next.ready ? 'ready' : 'degraded'} at ${next.target}.`;
-      if (next.ready) this.logger.log(message);
-      else this.logger.error(`${message} ${next.reason}`);
+      if (next.ready) {this.logger.log(message);}
+      else {this.logger.error(`${message} ${next.reason}`);}
     }
   }
 }

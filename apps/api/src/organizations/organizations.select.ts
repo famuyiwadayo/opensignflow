@@ -1,4 +1,4 @@
-import { Prisma } from '@opensignflow/database';
+import type { Prisma } from '@opensignflow/database';
 
 export const organizationPublicSelect = {
   id: true,

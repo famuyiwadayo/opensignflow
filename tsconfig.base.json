@@ -11,5 +11,6 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true
-  }
+  },
+  "include": ["eslint.config.mjs"]
 }

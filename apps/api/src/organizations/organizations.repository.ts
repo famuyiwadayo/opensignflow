@@ -1,15 +1,17 @@
-import { IdGeneratorService } from '@/common';
-import { PrismaService } from '@/database';
+import type { IdGeneratorService } from '@/common';
+import type { PrismaService } from '@/database';
 import { Injectable } from '@nestjs/common';
 
+import type {
+  OrganizationMembershipRecord} from './organizations.select';
 import {
-  OrganizationMembershipRecord,
   organizationMembershipSelect,
 } from './organizations.select';
+import type {
+  Prisma} from '@opensignflow/database';
 import {
   OrganizationRole,
   PlanCode,
-  Prisma,
   SubscriptionStatus,
 } from '@opensignflow/database';
 

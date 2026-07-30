@@ -40,6 +40,6 @@ export function decryptPayload(input: EncryptedPayload & { base64Key: string }):
 
 function decodeKey(base64Key: string): Buffer {
   const key = Buffer.from(base64Key, 'base64');
-  if (key.length !== 32) throw new Error('Outbox encryption key must decode to exactly 32 bytes.');
+  if (key.length !== 32) {throw new Error('Outbox encryption key must decode to exactly 32 bytes.');}
   return key;
 }

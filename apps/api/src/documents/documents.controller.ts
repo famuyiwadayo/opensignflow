@@ -22,7 +22,8 @@ import {
 import type { Request } from 'express';
 import { memoryStorage } from 'multer';
 
-import { ListAuditEventsQueryDto, AuditEventEntity } from '@/audit';
+import type { ListAuditEventsQueryDto} from '@/audit';
+import { AuditEventEntity } from '@/audit';
 import { JwtAuthGuard } from '@/auth/guards';
 import {
   ApiCreatedDataResponse,
@@ -31,13 +32,14 @@ import {
   CurrentUser,
   type AuthenticatedUser,
 } from '@/common';
-import {
+import type {
   CreateDocumentDto,
   DownloadUrlQueryDto,
   ListDocumentsQueryDto,
 } from './dto';
 import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
-import { DocumentsService, type UploadedPdfFile } from './documents.service';
+import type { DocumentsService} from './documents.service';
+import type { UploadedPdfFile } from './documents.service';
 
 @ApiTags('documents')
 @ApiBearerAuth()

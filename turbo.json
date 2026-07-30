@@ -20,9 +20,13 @@
         "^lint"
       ]
     },
+    "lint:fix": {
+      "dependsOn": [
+        "^lint:fix"
+      ]
+    },
     "typecheck": {
       "dependsOn": [
-        "^build",
         "^typecheck"
       ]
     },

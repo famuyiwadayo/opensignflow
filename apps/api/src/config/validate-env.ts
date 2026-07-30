@@ -31,16 +31,6 @@ const envSchema = z.object({
 });
 
 export function validateEnv(config: Record<string, unknown>) {
-  console.log({
-    databaseUrlPresent: Boolean(config.DATABASE_URL),
-    redisUrlPresent: Boolean(config.REDIS_URL),
-    outboxEncryptionKeyPresent: Boolean(config.OUTBOX_ENCRYPTION_KEY),
-    outboxEncryptionKeyVersionPresent: Boolean(
-      config.OUTBOX_ENCRYPTION_KEY_VERSION,
-    ),
-    nodeEnv: config.NODE_ENV,
-  });
-
   const parsed = envSchema.safeParse(config);
 
   if (!parsed.success) {

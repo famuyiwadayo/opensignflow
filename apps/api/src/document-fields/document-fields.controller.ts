@@ -26,13 +26,13 @@ import {
   CurrentUser,
   type AuthenticatedUser,
 } from '@/common';
-import {
+import type {
   BulkAssignDocumentFieldsDto,
   CreateDocumentFieldDto,
   UpdateDocumentFieldDto,
 } from './dto';
 import { DocumentFieldEntity } from './entities';
-import { DocumentFieldsService } from './document-fields.service';
+import type { DocumentFieldsService } from './document-fields.service';
 
 @ApiTags('document-fields')
 @ApiBearerAuth()

@@ -1,7 +1,8 @@
 import { randomBytes } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
-import { ID_PREFIXES, IdPrefix, IdPrefixName } from '@opensignflow/shared';
+import type { IdPrefix, IdPrefixName } from '@opensignflow/shared';
+import { ID_PREFIXES } from '@opensignflow/shared';
 
 export type PublicIdPrefix = IdPrefix;
 

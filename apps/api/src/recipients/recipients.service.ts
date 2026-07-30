@@ -12,18 +12,19 @@ import {
   RecipientRole,
 } from '@opensignflow/database';
 
-import { AuditService } from '@/audit';
+import type { AuditService } from '@/audit';
+import type {
+  IdGeneratorService} from '@/common';
 import {
   apiError,
   ErrorCode,
-  IdGeneratorService,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import { DocumentsService } from '@/documents';
-import { CreateRecipientDto, UpdateRecipientDto } from './dto';
+import type { DocumentsService } from '@/documents';
+import type { CreateRecipientDto, UpdateRecipientDto } from './dto';
 import { RecipientEntity } from './entities';
-import { RecipientsRepository } from './recipients.repository';
+import type { RecipientsRepository } from './recipients.repository';
 
 @Injectable()
 export class RecipientsService {

@@ -6,7 +6,8 @@
         "dev": "nest start --watch",
         "build": "nest build",
         "start": "node dist/main.js",
-        "lint": "eslint \"src/**/*.ts\"",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
         "typecheck": "tsc -p tsconfig.json --noEmit",
         "test": "jest",
         "clean": "rm -rf dist coverage"
@@ -34,8 +35,6 @@
         "@types/node": "^26.1.1",
         "@types/nodemailer": "^8.0.1",
         "@types/pg": "^8.20.0",
-        "@typescript-eslint/eslint-plugin": "^8.65.0",
-        "@typescript-eslint/parser": "^8.65.0",
         "eslint": "^10.8.0",
         "jest": "^30.4.2",
         "ts-jest": "^29.4.12",
