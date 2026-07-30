@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import type { PrismaService } from '@/database';
+import { Inject, Injectable } from '@nestjs/common';
+import { PrismaService } from '@/database';
 import { documentFieldApiSelect } from './document-fields.select';
 import type { Prisma } from '@opensignflow/database';
 
@@ -38,7 +38,7 @@ type CreateDocumentFieldInput = Required<
 
 @Injectable()
 export class DocumentFieldsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   listByDocumentId(documentId: string) {
     return this.prisma.documentField.findMany({

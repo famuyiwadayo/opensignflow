@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { OutboxEventType } from '@opensignflow/database';
 
-import type { SigningEmailOutboxHandler } from './handlers';
+import { SigningEmailOutboxHandler } from './handlers';
 import type { OutboxEventHandler } from './outbox-handler.interface';
 
 @Injectable()
 export class OutboxHandlerRegistry {
   private readonly handlers = new Map<OutboxEventType, OutboxEventHandler<unknown>>();
 
-  constructor(signingEmail: SigningEmailOutboxHandler) {
+  constructor(@Inject(SigningEmailOutboxHandler) signingEmail: SigningEmailOutboxHandler) {
     this.register(signingEmail);
   }
 
@@ -17,8 +17,9 @@ export class OutboxHandlerRegistry {
   }
 
   private register(handler: OutboxEventHandler<unknown>) {
-    if (this.handlers.has(handler.type))
-      {throw new Error(`Duplicate outbox handler: ${handler.type}`);}
+    if (this.handlers.has(handler.type)) {
+      throw new Error(`Duplicate outbox handler: ${handler.type}`);
+    }
     this.handlers.set(handler.type, handler);
   }
 }

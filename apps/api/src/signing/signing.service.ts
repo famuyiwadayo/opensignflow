@@ -1,6 +1,10 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import {
+  Inject,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { encryptPayload } from '@opensignflow/crypto';
 import {
   AuditActorType,
@@ -10,17 +14,16 @@ import {
   RecipientStatus,
   SigningRequestStatus,
 } from '@opensignflow/database';
-import type {
-  IdGeneratorService} from '@/common';
+import { IdGeneratorService } from '@/common';
 import {
   apiError,
   ErrorCode,
   type AuthenticatedUser,
   type RequestContext,
 } from '@/common';
-import type { PrismaService } from '@/database';
-import type { DocumentsService } from '@/documents';
-import type { AuditService } from '@/audit';
+import { PrismaService } from '@/database';
+import { DocumentsService } from '@/documents';
+import { AuditService } from '@/audit';
 import type {
   OutboxPayloadEnvelope,
   SendSigningEmailOutboxPayload,
@@ -29,11 +32,13 @@ import type {
 @Injectable()
 export class SigningService {
   constructor(
+    @Inject(DocumentsService)
     private readonly documentsService: DocumentsService,
-    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
-    private readonly auditService: AuditService,
-    private readonly config: ConfigService,
+    @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(ConfigService) private readonly config: ConfigService,
   ) {}
 
   async send(input: {
@@ -43,13 +48,14 @@ export class SigningService {
     context: RequestContext;
   }) {
     const document = await this.documentsService.getById(input);
-    if (document.status !== DocumentStatus.DRAFT)
-      {throw new UnprocessableEntityException(
+    if (document.status !== DocumentStatus.DRAFT) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_ALREADY_SENT,
           'Document has already been sent or is no longer a draft.',
         ),
-      );}
+      );
+    }
     const recipients = await this.prisma.recipient.findMany({
       where: { documentId: document.id },
       select: { id: true, email: true, name: true, role: true },
@@ -65,33 +71,36 @@ export class SigningService {
       !signers.length ||
       !fields.length ||
       fields.some((field) => !field.recipientId)
-    )
-      {throw new UnprocessableEntityException(
+    ) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'A document needs at least one signer and one assigned field before it can be sent.',
         ),
-      );}
+      );
+    }
     const signerIds = new Set(signers.map((recipient) => recipient.id));
     if (
       fields.some(
         (field) => !field.recipientId || !signerIds.has(field.recipientId),
       )
-    )
-      {throw new UnprocessableEntityException(
+    ) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'Every field must be assigned to a signer recipient.',
         ),
-      );}
+      );
+    }
     const assignedSignerIds = new Set(fields.map((field) => field.recipientId));
-    if (signers.some((signer) => !assignedSignerIds.has(signer.id)))
-      {throw new UnprocessableEntityException(
+    if (signers.some((signer) => !assignedSignerIds.has(signer.id))) {
+      throw new UnprocessableEntityException(
         apiError(
           ErrorCode.DOCUMENT_SEND_REQUIREMENTS_NOT_MET,
           'Every signer must have at least one assigned field before the document can be sent.',
         ),
-      );}
+      );
+    }
     const now = new Date();
     const signingRequests = signers.map((recipient) => ({
       id: this.idGenerator.generate('signingRequest'),
@@ -147,13 +156,14 @@ export class SigningService {
         data: { status: DocumentStatus.SENT, sentAt: now },
       });
 
-      if (!transitioned.count)
-        {throw new UnprocessableEntityException(
+      if (!transitioned.count) {
+        throw new UnprocessableEntityException(
           apiError(
             ErrorCode.DOCUMENT_ALREADY_SENT,
             'Document has already been sent or is no longer a draft.',
           ),
-        );}
+        );
+      }
 
       await tx.recipient.updateMany({
         where: {

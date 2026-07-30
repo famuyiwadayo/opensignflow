@@ -6,6 +6,7 @@ import {
   Headers,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -32,14 +33,17 @@ import type {
   UpdateDocumentFieldDto,
 } from './dto';
 import { DocumentFieldEntity } from './entities';
-import type { DocumentFieldsService } from './document-fields.service';
+import { DocumentFieldsService } from './document-fields.service';
 
 @ApiTags('document-fields')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('v1/documents/:documentId/fields')
 export class DocumentFieldsController {
-  constructor(private readonly fieldsService: DocumentFieldsService) {}
+  constructor(
+    @Inject(DocumentFieldsService)
+    private readonly fieldsService: DocumentFieldsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List fields for a document' })

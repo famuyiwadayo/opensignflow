@@ -6,6 +6,7 @@ import {
   Headers,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -29,14 +30,17 @@ import {
 } from '@/common';
 import type { CreateRecipientDto, UpdateRecipientDto } from './dto';
 import { RecipientEntity } from './entities';
-import type { RecipientsService } from './recipients.service';
+import { RecipientsService } from './recipients.service';
 
 @ApiTags('recipients')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('v1/documents/:documentId/recipients')
 export class RecipientsController {
-  constructor(private readonly recipientsService: RecipientsService) {}
+  constructor(
+    @Inject(RecipientsService)
+    private readonly recipientsService: RecipientsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List recipients for a document' })

@@ -1,6 +1,6 @@
 import type { OnModuleDestroy } from '@nestjs/common';
-import { Injectable, Logger } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createQueue } from '@opensignflow/queue';
 import {
   QueueJobName,
@@ -23,7 +23,7 @@ export class SigningEmailQueue implements OnModuleDestroy {
   private readonly logger = new Logger(SigningEmailQueue.name);
   private readonly queue: ReturnType<typeof createQueue<SendSigningEmailJob>>;
 
-  constructor(config: ConfigService) {
+  constructor(@Inject(ConfigService) config: ConfigService) {
     this.queue = createQueue<SendSigningEmailJob>({
       name: QueueName.SIGNING_EMAIL,
       redisUrl: config.getOrThrow<string>('REDIS_URL'),
@@ -82,7 +82,9 @@ export class SigningEmailQueue implements OnModuleDestroy {
         }),
       ]);
     } finally {
-      if (timeout) {clearTimeout(timeout);}
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     }
   }
 }

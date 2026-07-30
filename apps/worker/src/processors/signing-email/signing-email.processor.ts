@@ -1,5 +1,5 @@
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { createQueue, createWorker } from '@opensignflow/queue';
 import {
   QueueJobName,
@@ -7,7 +7,7 @@ import {
   type SendSigningEmailJob,
   type SigningEmailDeadLetterJob,
 } from '@opensignflow/shared';
-import type { MailService} from '@/mail';
+import { MailService } from '@/mail';
 import { signingRequestTemplate } from '@/mail';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
   private worker?: ReturnType<typeof createWorker<SendSigningEmailJob>>;
   private deadLetterQueue?: ReturnType<typeof createQueue<SigningEmailDeadLetterJob>>;
 
-  constructor(private readonly mailService: MailService) {}
+  constructor(@Inject(MailService) private readonly mailService: MailService) {}
 
   async onModuleInit() {
     const redisUrl = process.env.REDIS_URL;
@@ -57,7 +57,9 @@ export class SigningEmailProcessor implements OnModuleInit, OnModuleDestroy {
         `Signing email job ${job?.id ?? 'unknown'} failed on attempt ${job?.attemptsMade ?? 'unknown'}.`,
         error.stack,
       );
-      if (!job || job.attemptsMade < (job.opts.attempts ?? 1)) {return;}
+      if (!job || job.attemptsMade < (job.opts.attempts ?? 1)) {
+        return;
+      }
       void this.deadLetterQueue
         ?.add(QueueJobName.SIGNING_EMAIL_DELIVERY_FAILED, {
           originalJobId: job.id ?? 'unknown',

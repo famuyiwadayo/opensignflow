@@ -1,6 +1,7 @@
 import {
   Controller,
   Headers,
+  Inject,
   Param,
   Post,
   Req,
@@ -15,14 +16,16 @@ import {
   type AuthenticatedUser,
 } from '@/common';
 import { DocumentEntity } from '@/documents';
-import type { SigningService } from './signing.service';
+import { SigningService } from './signing.service';
 
 @ApiTags('signing')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('v1/documents')
 export class SigningController {
-  constructor(private readonly signingService: SigningService) {}
+  constructor(
+    @Inject(SigningService) private readonly signingService: SigningService,
+  ) {}
 
   @Post(':documentId/send')
   @ApiOperation({ summary: 'Send a draft document for signing' })

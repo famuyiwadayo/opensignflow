@@ -1,17 +1,20 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-
-import type {
-  IdGeneratorService} from '@/common';
 import {
-  apiError,
-  ErrorCode,
-  type RequestContext,
-} from '@/common';
-import type { PrismaService } from '@/database';
+  Inject,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+
+import { IdGeneratorService } from '@/common';
+import { apiError, ErrorCode, type RequestContext } from '@/common';
+import { PrismaService } from '@/database';
 import type { ListAuditEventsQueryDto } from './dto';
 import { AuditEventEntity } from './entities';
-import type { AuditRepository } from './audit.repository';
-import type { AuditActorType, AuditEventType, Prisma } from '@opensignflow/database';
+import { AuditRepository } from './audit.repository';
+import type {
+  AuditActorType,
+  AuditEventType,
+  Prisma,
+} from '@opensignflow/database';
 
 type PrismaWriter = PrismaService | Prisma.TransactionClient;
 
@@ -30,9 +33,10 @@ export type RecordAuditEventInput = {
 @Injectable()
 export class AuditService {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
-    private readonly auditRepository: AuditRepository,
+    @Inject(AuditRepository) private readonly auditRepository: AuditRepository,
   ) {}
 
   async listForDocument(input: {
@@ -92,7 +96,9 @@ export class AuditService {
       const parsed = JSON.parse(
         Buffer.from(cursor, 'base64url').toString('utf8'),
       ) as { id?: string };
-      if (!parsed.id) {throw new Error('Missing cursor id.');}
+      if (!parsed.id) {
+        throw new Error('Missing cursor id.');
+      }
       return parsed.id;
     } catch {
       throw new UnprocessableEntityException(

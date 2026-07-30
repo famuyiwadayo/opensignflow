@@ -1,6 +1,6 @@
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import {
   createPrismaClientOptions,
@@ -12,7 +12,7 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor(configService: ConfigService) {
+  constructor(@Inject(ConfigService) configService: ConfigService) {
     const databaseUrl = configService.get<string>('DATABASE_URL');
 
     if (!databaseUrl) {

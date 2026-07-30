@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import type { UsersRepository } from './users.repository';
-import type { IdGeneratorService } from '@/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { UsersRepository } from './users.repository';
+import { IdGeneratorService } from '@/common';
 import { apiError, ErrorCode } from '@/common';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepo: UsersRepository,
+    @Inject(UsersRepository) private readonly usersRepo: UsersRepository,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
 

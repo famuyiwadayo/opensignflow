@@ -1,24 +1,16 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 
-import type {
-  IdGeneratorService,
-  RequestContext} from '@/common';
-import {
-  apiError,
-  ErrorCode
-} from '@/common';
-import type { PrismaService } from '@/database';
-import type {
-  OrganizationsRepository,
-  OrganizationsService} from '@/organizations';
-import {
-  OrganizationMembershipEntity
-} from '@/organizations';
-import type { UsersRepository, UsersService } from '@/users';
+import { IdGeneratorService, type RequestContext } from '@/common';
+import { apiError, ErrorCode } from '@/common';
+import { PrismaService } from '@/database';
+import { OrganizationsRepository, OrganizationsService } from '@/organizations';
+import { OrganizationMembershipEntity } from '@/organizations';
+import { UsersRepository, UsersService } from '@/users';
 import { UserEntity } from '@/users';
 import type {
   AuthResponseDto,
@@ -26,9 +18,9 @@ import type {
   MeResponseDto,
   RegisterDto,
 } from './dto';
-import type { PasswordService } from './password.service';
-import type { RefreshSessionService } from './refresh-session.service';
-import type { TokenService } from './token.service';
+import { PasswordService } from './password.service';
+import { RefreshSessionService } from './refresh-session.service';
+import { TokenService } from './token.service';
 
 type AuthResult = {
   response: AuthResponseDto;
@@ -39,14 +31,18 @@ type AuthResult = {
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly usersRepository: UsersRepository,
-    private readonly usersService: UsersService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(OrganizationsRepository)
     private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(OrganizationsService)
     private readonly organizationsService: OrganizationsService,
-    private readonly passwordService: PasswordService,
-    private readonly tokenService: TokenService,
+    @Inject(PasswordService) private readonly passwordService: PasswordService,
+    @Inject(TokenService) private readonly tokenService: TokenService,
+    @Inject(RefreshSessionService)
     private readonly refreshSessionService: RefreshSessionService,
+    @Inject(IdGeneratorService)
     private readonly idGenerator: IdGeneratorService,
   ) {}
 

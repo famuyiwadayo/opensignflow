@@ -1,15 +1,19 @@
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { Injectable, Logger } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { probeQueueReadiness, type QueueReadiness } from '@opensignflow/queue';
 
 @Injectable()
 export class QueueReadinessService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(QueueReadinessService.name);
-  private readiness: QueueReadiness = { ready: false, target: 'unverified', reason: 'Readiness probe has not completed.' };
+  private readiness: QueueReadiness = {
+    ready: false,
+    target: 'unverified',
+    reason: 'Readiness probe has not completed.',
+  };
   private timer?: NodeJS.Timeout;
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(@Inject(ConfigService) private readonly config: ConfigService) {}
 
   async onModuleInit() {
     await this.refresh();
@@ -18,7 +22,9 @@ export class QueueReadinessService implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleDestroy() {
-    if (this.timer) {clearInterval(this.timer);}
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   }
 
   getStatus(): QueueReadiness {
@@ -30,12 +36,17 @@ export class QueueReadinessService implements OnModuleInit, OnModuleDestroy {
       redisUrl: this.config.getOrThrow<string>('REDIS_URL'),
       connectionName: 'api-readiness-probe',
     });
-    const changed = next.ready !== this.readiness.ready || next.target !== this.readiness.target;
+    const changed =
+      next.ready !== this.readiness.ready ||
+      next.target !== this.readiness.target;
     this.readiness = next;
     if (changed) {
       const message = `Redis queue dependency is ${next.ready ? 'ready' : 'degraded'} at ${next.target}.`;
-      if (next.ready) {this.logger.log(message);}
-      else {this.logger.error(`${message} ${next.reason}`);}
+      if (next.ready) {
+        this.logger.log(message);
+      } else {
+        this.logger.error(`${message} ${next.reason}`);
+      }
     }
   }
 }

@@ -180,8 +180,8 @@ Do not assert raw timestamps, random IDs, encrypted ciphertext, or internal Pris
 
 ## Initial coverage priorities
 
-1. `packages/crypto`: encryption/authentication failure tests.
-2. recipient role and field ownership service tests.
+1. `packages/crypto`: encryption/authentication failure tests. **Implemented.**
+2. recipient role and field ownership service tests. **Role downgrade service coverage started.**
 3. signing send transaction + encrypted outbox integration tests.
 4. worker outbox dispatch/claim/retry/lease integration tests.
 5. auth API integration tests.
