@@ -1,15 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OutboxEventType } from '@opensignflow/database';
 
-import { SigningEmailOutboxHandler } from './handlers';
+import { PdfFinalizationOutboxHandler, SigningEmailOutboxHandler } from './handlers';
 import type { OutboxEventHandler } from './outbox-handler.interface';
 
 @Injectable()
 export class OutboxHandlerRegistry {
   private readonly handlers = new Map<OutboxEventType, OutboxEventHandler<unknown>>();
 
-  constructor(@Inject(SigningEmailOutboxHandler) signingEmail: SigningEmailOutboxHandler) {
+  constructor(
+    @Inject(SigningEmailOutboxHandler) signingEmail: SigningEmailOutboxHandler,
+    @Inject(PdfFinalizationOutboxHandler) pdfFinalization: PdfFinalizationOutboxHandler,
+  ) {
     this.register(signingEmail);
+    this.register(pdfFinalization);
   }
 
   get(type: OutboxEventType) {

@@ -97,6 +97,7 @@ enum AiAnalysisType {
 
 enum OutboxEventType {
   SEND_SIGNING_EMAIL
+  FINALIZE_COMPLETED_DOCUMENT
 }
 
 enum OutboxEventStatus {

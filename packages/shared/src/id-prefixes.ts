@@ -6,6 +6,7 @@ export const ID_PREFIXES = {
   userSession: 'ses',
   document: 'doc',
   documentField: 'fld',
+  documentFieldValue: 'fval',
   recipient: 'rcp',
   signingRequest: 'sreq',
   signingSubmission: 'ssub',

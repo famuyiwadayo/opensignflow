@@ -12,6 +12,7 @@ export type QueueName = (typeof QueueName)[keyof typeof QueueName];
 export const QueueJobName = {
   SEND_SIGNING_EMAIL: 'send-signing-request',
   SIGNING_EMAIL_DELIVERY_FAILED: 'signing-email-delivery-failed',
+  FINALIZE_COMPLETED_DOCUMENT: 'finalize-completed-document',
 } as const;
 
 export type QueueJobName = (typeof QueueJobName)[keyof typeof QueueJobName];

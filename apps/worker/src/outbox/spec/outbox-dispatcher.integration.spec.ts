@@ -1,6 +1,7 @@
 import { encryptPayload } from '@opensignflow/crypto';
 import { OutboxEventStatus, OutboxEventType } from '@opensignflow/database';
 import { createQueue } from '@opensignflow/queue';
+import type { FinalizeCompletedDocumentOutboxPayload } from '@opensignflow/shared';
 import {
   QueueName,
   type OutboxPayloadEnvelope,
@@ -21,6 +22,7 @@ import { WorkerPrismaService } from '../../database/worker-prisma.service';
 import { SigningEmailOutboxHandler } from '../handlers/signing-email.outbox-handler';
 import { OutboxDispatcherService } from '../outbox-dispatcher.service';
 import { OutboxHandlerRegistry } from '../outbox-handler.registry';
+import { PdfFinalizationOutboxHandler } from '../handlers';
 
 jest.setTimeout(120_000);
 const key = Buffer.alloc(32, 4).toString('base64');
@@ -55,11 +57,12 @@ describe('OutboxDispatcherService', () => {
     const workerDatabase = new WorkerPrismaService();
     await workerDatabase.onModuleInit();
     const handler = new SigningEmailOutboxHandler();
+    const pdfHandler = new PdfFinalizationOutboxHandler();
     try {
-      const registry = new OutboxHandlerRegistry(handler);
+      const registry = new OutboxHandlerRegistry(handler, pdfHandler);
       await action(new OutboxDispatcherService(workerDatabase, registry));
     } finally {
-      await handler.onModuleDestroy();
+      await Promise.all([handler.onModuleDestroy(), pdfHandler.onModuleDestroy()]);
       await workerDatabase.onModuleDestroy();
       if (previous.DATABASE_URL === undefined) {
         delete process.env.DATABASE_URL;
@@ -123,7 +126,8 @@ describe('OutboxDispatcherService', () => {
       const workerDatabase = new WorkerPrismaService();
       await workerDatabase.onModuleInit();
       const handler = new SigningEmailOutboxHandler();
-      const registry = new OutboxHandlerRegistry(handler);
+      const pdfHandler = new PdfFinalizationOutboxHandler();
+      const registry = new OutboxHandlerRegistry(handler, pdfHandler);
       const dispatcher = new OutboxDispatcherService(workerDatabase, registry);
       await (dispatcher as unknown as { dispatch(eventId: string): Promise<void> }).dispatch(
         event.id,
@@ -140,13 +144,61 @@ describe('OutboxDispatcherService', () => {
       const job = await inspector.getJob('signing-request-sreq_1');
       expect(job?.data.recipientEmail).toBe('signer@example.test');
       await inspector.close();
-      await handler.onModuleDestroy();
+      await Promise.all([handler.onModuleDestroy(), pdfHandler.onModuleDestroy()]);
       await workerDatabase.onModuleDestroy();
     } finally {
       process.env.DATABASE_URL = previous.DATABASE_URL;
       process.env.REDIS_URL = previous.REDIS_URL;
       process.env.OUTBOX_ENCRYPTION_KEY = previous.OUTBOX_ENCRYPTION_KEY;
     }
+  });
+
+  it('dispatches completed-document finalization to the stable PDF queue job', async () => {
+    const user = userFactory();
+    const organization = organizationFactory();
+    await database.user.create({ data: user });
+    await database.organization.create({ data: organization });
+    const payload: OutboxPayloadEnvelope<
+      'FINALIZE_COMPLETED_DOCUMENT',
+      FinalizeCompletedDocumentOutboxPayload
+    > = {
+      version: 1,
+      type: 'FINALIZE_COMPLETED_DOCUMENT',
+      payload: { documentId: 'doc_final', organizationId: organization.id },
+    };
+    const encrypted = encryptPayload({
+      plaintext: JSON.stringify(payload),
+      base64Key: key,
+      keyVersion: 'test-v1',
+    });
+    const event = outboxEventFactory({
+      organizationId: organization.id,
+      type: 'FINALIZE_COMPLETED_DOCUMENT',
+      resourceType: 'DOCUMENT',
+      resourceId: 'doc_final',
+      encryptedPayload: JSON.stringify(encrypted),
+      encryptionKeyVersion: encrypted.keyVersion,
+    });
+    await database.outboxEvent.create({ data: event });
+
+    await withWorker(async (dispatcher) => {
+      await (dispatcher as unknown as { dispatch(eventId: string): Promise<void> }).dispatch(
+        event.id,
+      );
+    });
+    expect((await database.outboxEvent.findUniqueOrThrow({ where: { id: event.id } })).status).toBe(
+      OutboxEventStatus.DISPATCHED,
+    );
+    const inspector = createQueue<FinalizeCompletedDocumentOutboxPayload>({
+      name: QueueName.PDF_FINALIZATION,
+      redisUrl: services.redisUrl,
+      connectionName: 'test-pdf-queue-inspector',
+      role: 'producer',
+    });
+    expect((await inspector.getJob('document-finalization-doc_final'))?.data.documentId).toBe(
+      'doc_final',
+    );
+    await inspector.close();
   });
 
   it('returns a malformed payload event to PENDING with a retry time', async () => {
