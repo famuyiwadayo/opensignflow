@@ -82,7 +82,10 @@ describe('PublicSigningService integration', () => {
       token,
       {
         values: [
-          { fieldId: workflow.fields[0].id, value: { signature: 'Grace' } },
+          {
+            fieldId: workflow.fields[0].id,
+            value: { type: 'TYPED_NAME', name: 'Grace Hopper' },
+          },
         ],
       },
       {},
@@ -195,7 +198,12 @@ describe('PublicSigningService integration', () => {
     await service.submit(
       tokenA,
       {
-        values: [{ fieldId: workflow.fields[0].id, value: { signature: 'A' } }],
+        values: [
+          {
+            fieldId: workflow.fields[0].id,
+            value: { type: 'TYPED_NAME', name: 'Signer A' },
+          },
+        ],
       },
       {},
     );
@@ -209,7 +217,12 @@ describe('PublicSigningService integration', () => {
     await service.submit(
       tokenB,
       {
-        values: [{ fieldId: workflow.fields[1].id, value: { signature: 'B' } }],
+        values: [
+          {
+            fieldId: workflow.fields[1].id,
+            value: { type: 'TYPED_NAME', name: 'Signer B' },
+          },
+        ],
       },
       {},
     );

@@ -13,14 +13,15 @@
         "clean": "rm -rf dist coverage"
     },
     "dependencies": {
-        "@nestjs/common": "^11.1.28",
-        "@nestjs/config": "^4.0.4",
-        "@nestjs/core": "^11.1.28",
         "@opensignflow/config": "workspace:*",
         "@opensignflow/crypto": "workspace:*",
         "@opensignflow/database": "workspace:*",
         "@opensignflow/queue": "workspace:*",
         "@opensignflow/shared": "workspace:*",
+        "@opensignflow/storage": "workspace:*",
+        "@nestjs/common": "^11.1.28",
+        "@nestjs/config": "^4.0.4",
+        "@nestjs/core": "^11.1.28",
         "bullmq": "^5.81.2",
         "ioredis": "^5.11.1",
         "nodemailer": "^9.0.3",

@@ -1,49 +1,28 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import {
-  Inject,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
+import { ObjectStorage } from '@opensignflow/storage';
 
-import { apiError, ErrorCode } from '@/common';
+import { apiError, ErrorCode } from '../common';
 import type { CreateSignedUrlInput, UploadObjectInput } from './storage.types';
 
 @Injectable()
 export class StorageService {
-  private readonly client: S3Client;
-  private readonly bucket: string;
+  private readonly storage: ObjectStorage;
 
-  constructor(
-    @Inject(ConfigService) private readonly configService: ConfigService,
-  ) {
-    this.bucket = this.requiredConfig('S3_BUCKET');
-
-    this.client = new S3Client({
-      region: this.configService.get<string>('S3_REGION') ?? 'us-east-1',
-      endpoint: this.configService.get<string>('S3_ENDPOINT'),
-      credentials: {
-        accessKeyId: this.requiredConfig('S3_ACCESS_KEY_ID'),
-        secretAccessKey: this.requiredConfig('S3_SECRET_ACCESS_KEY'),
-      },
-      forcePathStyle:
-        this.configService.get<string>('S3_FORCE_PATH_STYLE') === 'true',
+  constructor(config: ConfigService) {
+    this.storage = new ObjectStorage({
+      bucket: required(config, 'S3_BUCKET'),
+      region: config.get<string>('S3_REGION') ?? 'us-east-1',
+      endpoint: config.get<string>('S3_ENDPOINT'),
+      accessKeyId: required(config, 'S3_ACCESS_KEY_ID'),
+      secretAccessKey: required(config, 'S3_SECRET_ACCESS_KEY'),
+      forcePathStyle: config.get<string>('S3_FORCE_PATH_STYLE') === 'true',
     });
   }
 
   async uploadObject(input: UploadObjectInput): Promise<void> {
     try {
-      await this.client.send(
-        new PutObjectCommand({
-          Bucket: this.bucket,
-          Key: input.key,
-          Body: input.body,
-          ContentType: input.contentType,
-          ContentLength: input.contentLength,
-        }),
-      );
+      await this.storage.upload(input);
     } catch (error) {
       throw new ServiceUnavailableException(
         apiError(
@@ -64,18 +43,7 @@ export class StorageService {
 
   async createSignedDownloadUrl(input: CreateSignedUrlInput): Promise<string> {
     try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucket,
-        Key: input.key,
-        ResponseContentType: input.contentType,
-        ResponseContentDisposition: input.fileName
-          ? `attachment; filename="${this.sanitizeFileName(input.fileName)}"`
-          : undefined,
-      });
-
-      return getSignedUrl(this.client, command, {
-        expiresIn: input.expiresInSeconds ?? 300,
-      });
+      return await this.storage.createSignedDownloadUrl(input);
     } catch (error) {
       throw new ServiceUnavailableException(
         apiError(
@@ -93,18 +61,11 @@ export class StorageService {
       );
     }
   }
-
-  private requiredConfig(key: string): string {
-    const value = this.configService.get<string>(key);
-
-    if (!value) {
-      throw new Error(`${key} is required to initialize object storage.`);
-    }
-
-    return value;
+}
+function required(config: ConfigService, key: string) {
+  const value = config.get<string>(key);
+  if (!value) {
+    throw new Error(`${key} is required to initialize object storage.`);
   }
-
-  private sanitizeFileName(fileName: string): string {
-    return fileName.replace(/["\\\r\n]/g, '_');
-  }
+  return value;
 }
