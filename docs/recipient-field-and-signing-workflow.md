@@ -353,3 +353,17 @@ SSE is preferred before WebSockets because owner activity is server-to-browser c
 8. Add audit polling to owner dashboard.
 9. Add SSE activity stream.
 10. Add sequential signing mode and CC notification behavior.
+
+## 12. MVP field-value contract
+
+Public signing submission values are strict, not arbitrary JSON:
+
+```txt
+SIGNATURE → { type: "TYPED_NAME", name: string }
+INITIALS  → short non-empty string
+TEXT      → string up to 2,000 characters
+DATE      → YYYY-MM-DD string
+CHECKBOX  → boolean
+```
+
+Typed-name signatures are the MVP signature representation. They are accessible, auditable, and renderable by the PDF worker without image/SVG sanitization. Future signature types may add `DRAWN_SVG` or uploaded images without changing the document-field ownership model.

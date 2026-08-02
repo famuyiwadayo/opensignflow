@@ -19,9 +19,10 @@ import { PrismaService } from '@/database';
 import type { SubmitSigningRequestDto } from './dto';
 import type { PublicSigningRequestEntity } from './entities/signing-request.entity';
 import { ConfigService } from '@nestjs/config';
-import type {
-  FinalizeCompletedDocumentOutboxPayload,
-  OutboxPayloadEnvelope,
+import {
+  isTypedNameSignatureValue,
+  type FinalizeCompletedDocumentOutboxPayload,
+  type OutboxPayloadEnvelope,
 } from '@opensignflow/shared';
 import { encryptPayload } from '@opensignflow/crypto';
 
@@ -283,6 +284,29 @@ export class PublicSigningService {
       }
     });
     return { success: true };
+  }
+
+  private isValidFieldValue(type: string, value: unknown): boolean {
+    if (type === 'SIGNATURE') {
+      return isTypedNameSignatureValue(value);
+    }
+    if (type === 'CHECKBOX') {
+      return typeof value === 'boolean';
+    }
+    if (type === 'DATE') {
+      return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    }
+    if (type === 'TEXT') {
+      return typeof value === 'string' && value.length <= 2000;
+    }
+    if (type === 'INITIALS') {
+      return (
+        typeof value === 'string' &&
+        value.trim().length > 0 &&
+        value.length <= 12
+      );
+    }
+    return false;
   }
 
   private hash(token: string) {
