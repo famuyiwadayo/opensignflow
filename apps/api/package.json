@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "jest",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "clean": "rm -rf dist coverage"
   },
   "dependencies": {
@@ -52,6 +52,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.0.1",
+    "@opensignflow/testkit": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
@@ -60,6 +61,7 @@
     "@types/node": "^24.0.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.0.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.18.0",
     "globals": "^17.0.0",
     "jest": "^30.0.0",
@@ -71,7 +73,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^6"
+    "typescript": "5.9.3"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -82,7 +84,13 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": "<rootDir>/../tsconfig.json",
+          "isolatedModules": false
+        }
+      ]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

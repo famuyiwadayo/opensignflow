@@ -1,4 +1,3 @@
-import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { GenericContainer, type StartedTestContainer, Wait } from 'testcontainers';
 
 export type TestServices = {
@@ -9,10 +8,16 @@ export type TestServices = {
 
 /** Starts isolated PostgreSQL and Redis services for integration suites. */
 export async function startTestServices(): Promise<TestServices> {
-  const postgres = await new PostgreSqlContainer('postgres:16-alpine')
-    .withDatabase('opensignflow_test')
-    .withUsername('opensignflow')
-    .withPassword('opensignflow')
+  // PostgreSqlContainer's default health-check strategy can hang with some
+  // Docker Desktop/engine combinations. Use an explicit, portable log wait.
+  const postgres = await new GenericContainer('postgres:16-alpine')
+    .withEnvironment({
+      POSTGRES_DB: 'opensignflow_test',
+      POSTGRES_USER: 'opensignflow',
+      POSTGRES_PASSWORD: 'opensignflow',
+    })
+    .withExposedPorts(5432)
+    .withWaitStrategy(Wait.forLogMessage('database system is ready to accept connections', 2))
     .start();
   const redis = await new GenericContainer('redis:7-alpine')
     .withExposedPorts(6379)
@@ -22,12 +27,10 @@ export async function startTestServices(): Promise<TestServices> {
   return createServices(postgres, redis);
 }
 
-function createServices(
-  postgres: StartedPostgreSqlContainer,
-  redis: StartedTestContainer,
-): TestServices {
+function createServices(postgres: StartedTestContainer, redis: StartedTestContainer): TestServices {
+  const databaseUrl = `postgresql://opensignflow:opensignflow@${postgres.getHost()}:${postgres.getMappedPort(5432)}/opensignflow_test?schema=public`;
   return {
-    databaseUrl: postgres.getConnectionUri(),
+    databaseUrl,
     redisUrl: `redis://${redis.getHost()}:${redis.getMappedPort(6379)}`,
     async stop() {
       await Promise.all([postgres.stop(), redis.stop()]);

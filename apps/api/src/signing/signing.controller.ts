@@ -1,6 +1,8 @@
 import {
   Controller,
   Headers,
+  HttpCode,
+  HttpStatus,
   Inject,
   Param,
   Post,
@@ -9,13 +11,13 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { JwtAuthGuard } from '@/auth/guards';
+import { JwtAuthGuard } from '../auth/guards';
 import {
   ApiOkDataResponse,
   CurrentUser,
   type AuthenticatedUser,
-} from '@/common';
-import { DocumentEntity } from '@/documents';
+} from '../common';
+import { DocumentEntity } from '../documents';
 import { SigningService } from './signing.service';
 
 @ApiTags('signing')
@@ -28,6 +30,7 @@ export class SigningController {
   ) {}
 
   @Post(':documentId/send')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send a draft document for signing' })
   @ApiOkDataResponse(DocumentEntity)
   async send(

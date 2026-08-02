@@ -57,7 +57,7 @@ lease recovery
 
 ### API integration tests
 
-Use real Nest modules, guard/pipes/filters, PostgreSQL, and HTTP requests.
+Use real Nest modules, guard/pipes/filters, PostgreSQL, and HTTP requests. API-specific test bootstrapping lives in `apps/api/src/test/create-test-api.ts` so each suite mirrors `main.ts` validation/filter/cookie behavior rather than creating a divergent Nest app.
 
 ```txt
 auth registration/login
@@ -181,8 +181,12 @@ Do not assert raw timestamps, random IDs, encrypted ciphertext, or internal Pris
 ## Initial coverage priorities
 
 1. `packages/crypto`: encryption/authentication failure tests. **Implemented.**
-2. recipient role and field ownership service tests. **Role downgrade service coverage started.**
-3. signing send transaction + encrypted outbox integration tests.
+2. auth service policy tests. **Started: duplicate registration and non-enumerable invalid credentials coverage.**
+2. recipient role and field ownership tests. **Unit coverage plus real PostgreSQL signer-downgrade/reassignment and bulk-assignment coverage started.**
+3. Testcontainers PostgreSQL/Redis + migration harness. **Started.**
+4. signing send eligibility unit tests. **Started: signer/CC and field-assignment rejection coverage.**
+5. signing send transaction + encrypted outbox integration tests. **Started: signer-only request/outbox persistence coverage.**
+6. worker outbox dispatch integration tests. **Started: pending event → idempotent BullMQ job, malformed/dispatch retry, retry exhaustion, expired lease recovery, and concurrent claim coverage.**
 4. worker outbox dispatch/claim/retry/lease integration tests.
 5. auth API integration tests.
 6. full signing-email delivery workflow test.
@@ -211,4 +215,4 @@ bun run --filter=@opensignflow/api test
 bun run --filter=@opensignflow/worker test
 ```
 
-Integration suites will require Docker/Testcontainers availability. Unit tests must remain runnable without containers.
+Integration suites require Docker/Testcontainers availability. Testcontainers currently loads ESM dependencies, so Jest integration scripts use `cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand`. Unit-only packages may use plain Jest and remain container-free.
