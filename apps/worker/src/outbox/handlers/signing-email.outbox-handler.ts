@@ -1,3 +1,4 @@
+import type { OnModuleDestroy } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { OutboxEventType } from '@opensignflow/database';
 import { createQueue } from '@opensignflow/queue';
@@ -10,7 +11,9 @@ import {
 import type { OutboxEventHandler } from '../outbox-handler.interface';
 
 @Injectable()
-export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigningEmailOutboxPayload> {
+export class SigningEmailOutboxHandler
+  implements OutboxEventHandler<SendSigningEmailOutboxPayload>, OnModuleDestroy
+{
   readonly type = OutboxEventType.SEND_SIGNING_EMAIL;
 
   private readonly queue = createQueue<SendSigningEmailOutboxPayload>({
@@ -19,6 +22,10 @@ export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigning
     connectionName: 'worker-signing-email-outbox-handler',
     role: 'producer',
   });
+
+  onModuleDestroy() {
+    return this.queue.close();
+  }
 
   parse(serializedPayload: string): SendSigningEmailOutboxPayload {
     const envelope = JSON.parse(serializedPayload) as OutboxPayloadEnvelope<
@@ -45,8 +52,9 @@ export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigning
           typeof payload[field as keyof typeof payload] !== 'string' ||
           !payload[field as keyof typeof payload],
       )
-    )
-      {throw new Error('Invalid SEND_SIGNING_EMAIL outbox payload.');}
+    ) {
+      throw new Error('Invalid SEND_SIGNING_EMAIL outbox payload.');
+    }
     return payload;
   }
 
@@ -61,6 +69,8 @@ export class SigningEmailOutboxHandler implements OutboxEventHandler<SendSigning
 
 function required(name: string) {
   const value = process.env[name];
-  if (!value) {throw new Error(`${name} is required.`);}
+  if (!value) {
+    throw new Error(`${name} is required.`);
+  }
   return value;
 }

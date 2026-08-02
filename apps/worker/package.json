@@ -9,7 +9,7 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck": "tsc -p tsconfig.json --noEmit",
-        "test": "jest",
+        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
         "clean": "rm -rf dist coverage"
     },
     "dependencies": {
@@ -30,14 +30,36 @@
         "rxjs": "^7.8.2"
     },
     "devDependencies": {
+        "@opensignflow/testkit": "workspace:*",
         "@nestjs/cli": "^11.0.24",
         "@types/jest": "^30.0.0",
         "@types/node": "^26.1.1",
         "@types/nodemailer": "^8.0.1",
         "@types/pg": "^8.20.0",
+        "cross-env": "^10.1.0",
         "eslint": "^10.8.0",
         "jest": "^30.4.2",
         "ts-jest": "^29.4.12",
         "typescript": "^6"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "rootDir": "src",
+        "testRegex": ".*\\.spec\\.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "collectCoverageFrom": [
+            "**/*.(t|j)s"
+        ],
+        "moduleNameMapper": {
+            "^@/(.*)$": "<rootDir>/$1"
+        },
+        "coverageDirectory": "../coverage",
+        "testEnvironment": "node"
     }
 }

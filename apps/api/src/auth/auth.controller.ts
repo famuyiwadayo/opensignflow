@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
@@ -21,12 +20,15 @@ import {
   ApiCreatedDataResponse,
   ApiOkDataResponse,
   CurrentUser,
+  ValidatedBody,
 } from '@/common';
 import { JwtAuthGuard } from './guards';
 import type { AuthenticatedUser, RequestContext } from '@/common';
 import { AuthService } from './auth.service';
-import type { LoginDto, RegisterDto } from './dto';
-import { AuthResponseDto, MeResponseDto } from './dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
+import { MeResponseDto } from './dto/me-response.dto';
 
 const REFRESH_COOKIE_NAME = 'opensignflow_refresh_token';
 
@@ -41,7 +43,7 @@ export class AuthController {
   })
   @ApiCreatedDataResponse(AuthResponseDto)
   async register(
-    @Body() dto: RegisterDto,
+    @ValidatedBody(RegisterDto) dto: RegisterDto,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
@@ -66,7 +68,7 @@ export class AuthController {
   @ApiOkDataResponse(AuthResponseDto)
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async login(
-    @Body() dto: LoginDto,
+    @ValidatedBody(LoginDto) dto: LoginDto,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
