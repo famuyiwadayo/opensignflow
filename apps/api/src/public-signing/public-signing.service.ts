@@ -187,6 +187,25 @@ export class PublicSigningService {
         ),
       );
     }
+    for (const submittedValue of dto.values) {
+      const field = allowed.get(submittedValue.fieldId);
+      if (!field) {
+        throw new UnprocessableEntityException(
+          apiError(
+            ErrorCode.SIGNING_SUBMISSION_INVALID,
+            'Submitted field does not belong to this signing request.',
+          ),
+        );
+      }
+      if (!this.isValidFieldValue(field.type, submittedValue.value)) {
+        throw new UnprocessableEntityException(
+          apiError(
+            ErrorCode.SIGNING_SUBMISSION_INVALID,
+            'Submitted value does not match the document field type.',
+          ),
+        );
+      }
+    }
     await this.prisma.$transaction(async (tx) => {
       const submission = await tx.signingSubmission.create({
         data: {
@@ -252,6 +271,16 @@ export class PublicSigningService {
           },
           tx,
         );
+        const jobId = this.ids.generate('job');
+        await tx.jobRecord.create({
+          data: {
+            id: jobId,
+            organizationId: request.document.organizationId,
+            type: 'PDF_FINALIZATION',
+            resourceType: 'DOCUMENT',
+            resourceId: request.documentId,
+          },
+        });
         const payload: OutboxPayloadEnvelope<
           'FINALIZE_COMPLETED_DOCUMENT',
           FinalizeCompletedDocumentOutboxPayload
@@ -259,6 +288,7 @@ export class PublicSigningService {
           version: 1,
           type: 'FINALIZE_COMPLETED_DOCUMENT',
           payload: {
+            jobId,
             documentId: request.documentId,
             organizationId: request.document.organizationId,
           },

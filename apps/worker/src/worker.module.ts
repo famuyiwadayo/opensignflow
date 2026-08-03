@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/';
 import { OutboxModule } from './outbox';
-import { SigningEmailProcessor } from './processors';
+import { PdfFinalizationProcessor, SigningEmailProcessor } from './processors';
 import { WorkerStorageModule } from './storage';
 
 @Module({
@@ -12,6 +12,6 @@ import { WorkerStorageModule } from './storage';
     OutboxModule,
     WorkerStorageModule,
   ],
-  providers: [SigningEmailProcessor],
+  providers: [SigningEmailProcessor, PdfFinalizationProcessor],
 })
 export class WorkerModule {}

@@ -1,5 +1,9 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import {
+  Inject,
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ObjectStorage } from '@opensignflow/storage';
 
 import { apiError, ErrorCode } from '../common';
@@ -9,7 +13,7 @@ import type { CreateSignedUrlInput, UploadObjectInput } from './storage.types';
 export class StorageService {
   private readonly storage: ObjectStorage;
 
-  constructor(config: ConfigService) {
+  constructor(@Inject(ConfigService) config: ConfigService) {
     this.storage = new ObjectStorage({
       bucket: required(config, 'S3_BUCKET'),
       region: config.get<string>('S3_REGION') ?? 'us-east-1',
