@@ -153,6 +153,49 @@ describe('OutboxDispatcherService', () => {
     }
   });
 
+  it('retries malformed finalization payload without creating a PDF queue job', async () => {
+    const user = userFactory();
+    const organization = organizationFactory();
+    await database.user.create({ data: user });
+    await database.organization.create({ data: organization });
+    const payload = {
+      version: 1,
+      type: 'FINALIZE_COMPLETED_DOCUMENT',
+      payload: { documentId: 'doc_final', organizationId: organization.id },
+    };
+    const encrypted = encryptPayload({
+      plaintext: JSON.stringify(payload),
+      base64Key: key,
+      keyVersion: 'test-v1',
+    });
+    const event = outboxEventFactory({
+      organizationId: organization.id,
+      type: 'FINALIZE_COMPLETED_DOCUMENT',
+      resourceType: 'DOCUMENT',
+      resourceId: 'doc_final',
+      encryptedPayload: JSON.stringify(encrypted),
+      encryptionKeyVersion: encrypted.keyVersion,
+    });
+    await database.outboxEvent.create({ data: event });
+
+    await withWorker(async (dispatcher) => {
+      await (dispatcher as unknown as { dispatch(eventId: string): Promise<void> }).dispatch(
+        event.id,
+      );
+    });
+    const persisted = await database.outboxEvent.findUniqueOrThrow({ where: { id: event.id } });
+    expect(persisted.status).toBe(OutboxEventStatus.PENDING);
+    expect(persisted.attemptCount).toBe(1);
+    const inspector = createQueue<FinalizeCompletedDocumentOutboxPayload>({
+      name: QueueName.PDF_FINALIZATION,
+      redisUrl: services.redisUrl,
+      connectionName: 'test-malformed-pdf-inspector',
+      role: 'producer',
+    });
+    expect(await inspector.getJob('document-finalization-doc_final')).toBeUndefined();
+    await inspector.close();
+  });
+
   it('dispatches completed-document finalization to the stable PDF queue job', async () => {
     const user = userFactory();
     const organization = organizationFactory();
@@ -164,7 +207,7 @@ describe('OutboxDispatcherService', () => {
     > = {
       version: 1,
       type: 'FINALIZE_COMPLETED_DOCUMENT',
-      payload: { documentId: 'doc_final', organizationId: organization.id },
+      payload: { jobId: 'job_final', documentId: 'doc_final', organizationId: organization.id },
     };
     const encrypted = encryptPayload({
       plaintext: JSON.stringify(payload),
@@ -197,6 +240,9 @@ describe('OutboxDispatcherService', () => {
     });
     expect((await inspector.getJob('document-finalization-doc_final'))?.data.documentId).toBe(
       'doc_final',
+    );
+    expect((await inspector.getJob('document-finalization-doc_final'))?.data.jobId).toBe(
+      'job_final',
     );
     await inspector.close();
   });

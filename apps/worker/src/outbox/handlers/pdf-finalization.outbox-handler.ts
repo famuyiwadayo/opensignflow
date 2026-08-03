@@ -1,5 +1,4 @@
-import type { OnModuleDestroy } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import { Injectable, type OnModuleDestroy } from '@nestjs/common';
 import { OutboxEventType } from '@opensignflow/database';
 import { createQueue } from '@opensignflow/queue';
 import {
@@ -8,6 +7,7 @@ import {
   type FinalizeCompletedDocumentOutboxPayload,
   type OutboxPayloadEnvelope,
 } from '@opensignflow/shared';
+
 import type { OutboxEventHandler } from '../outbox-handler.interface';
 
 @Injectable()
@@ -28,14 +28,17 @@ export class PdfFinalizationOutboxHandler
       'FINALIZE_COMPLETED_DOCUMENT',
       FinalizeCompletedDocumentOutboxPayload
     >;
+
     if (
       envelope.version !== 1 ||
       envelope.type !== this.type ||
+      !envelope.payload?.jobId ||
       !envelope.payload?.documentId ||
       !envelope.payload?.organizationId
     ) {
       throw new Error('Invalid FINALIZE_COMPLETED_DOCUMENT outbox payload.');
     }
+
     return envelope.payload;
   }
 
@@ -51,10 +54,13 @@ export class PdfFinalizationOutboxHandler
     return this.queue.close();
   }
 }
+
 function required(name: string) {
   const value = process.env[name];
+
   if (!value) {
     throw new Error(`${name} is required.`);
   }
+
   return value;
 }

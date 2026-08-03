@@ -15,6 +15,7 @@ import {
 
 import { IdGeneratorService } from '@/common';
 import { PublicSigningService } from '../public-signing.service';
+import { decryptPayload } from '@opensignflow/crypto';
 
 jest.setTimeout(120_000);
 
@@ -239,7 +240,19 @@ describe('PublicSigningService integration', () => {
         resourceId: workflow.document.id,
       },
     });
+    const jobs = await database.jobRecord.findMany({
+      where: { resourceId: workflow.document.id },
+    });
     expect(finalizationEvents).toHaveLength(1);
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0].progressPercent).toBe(0);
+    const envelope = JSON.parse(
+      decryptPayload({
+        ...JSON.parse(finalizationEvents[0].encryptedPayload),
+        base64Key: Buffer.alloc(32, 5).toString('base64'),
+      }),
+    );
+    expect(envelope.payload.jobId).toBe(jobs[0].id);
   });
 
   it('rejects submission of a field owned by another signer', async () => {
