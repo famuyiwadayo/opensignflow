@@ -1,0 +1,52 @@
+{
+  "name": "@opensignflow/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",
+    "test": "echo 'No tests yet for @opensignflow/web'",
+    "clean": "rm -rf .next out coverage"
+  },
+  "dependencies": {
+    "@opensignflow/config": "workspace:*",
+    "@tanstack/react-form": "^1.33.3",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-table": "^9.0.0",
+    "@tanstack/react-virtual": "^3.14.9",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.28.0",
+    "next": "16.3.0",
+    "pdfjs-dist": "^6.2.108",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-signature-canvas": "^1.1.0-alpha.2",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.5.4",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "packageManager": "bun@1.3.5",
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
+}

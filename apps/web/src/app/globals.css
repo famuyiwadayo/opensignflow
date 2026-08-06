@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* @import "tailwindcss/preflight"; */
+/* @tailwind base; */
+/* @tailwind components; */
+@tailwind utilities;
+
+:root {
+  --background: 225 30% 7%;
+  --foreground: 220 33% 96%;
+  --muted: 225 22% 13%;
+  --muted-foreground: 220 16% 68%;
+  --primary: 199 100% 58%;
+  --primary-foreground: 225 30% 7%;
+  --border: 223 18% 22%;
+}
+* {
+  border-color: hsl(var(--border));
+}
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% -10%, rgba(75, 209, 255, 0.2), transparent 32%),
+    radial-gradient(circle at 88% 0%, rgba(123, 92, 255, 0.18), transparent 30%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+::selection {
+  background: rgba(75, 209, 255, 0.35);
+}
