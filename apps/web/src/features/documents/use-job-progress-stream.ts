@@ -1,7 +1,6 @@
 'use client';
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { documentKeys } from './hooks';
 
 /** Opens an authenticated fetch-based SSE stream; EventSource cannot send Bearer headers. */
 export function useJobProgressStream(input: {

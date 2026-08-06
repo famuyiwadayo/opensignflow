@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import { SubmitEvent, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
+
 import {
   useAuditEventsQuery,
   useDocumentDownloadMutation,
@@ -10,15 +11,14 @@ import {
   useSendDocumentMutation,
 } from '@/features/documents/hooks';
 import { useDeleteRecipientMutation, useRecipientsQuery } from '@/features/recipients/hooks';
-import {
-  useBulkAssignFieldsMutation,
-  useCreateFieldMutation,
-  useDeleteFieldMutation,
-  useFieldsQuery,
-} from '@/features/document-fields/hooks';
+import { useDeleteFieldMutation, useFieldsQuery } from '@/features/document-fields/hooks';
 import { RecipientForm } from '@/features/recipients/components/recipient-form';
+import { BulkAssignFieldsForm } from '@/features/document-fields/components/bulk-assign-fields-form';
+import { DocumentFieldForm } from '@/features/document-fields/components/document-field-form';
 import { useJobProgressStream } from '@/features/documents/use-job-progress-stream';
 import { useAuth } from '@/lib/auth/session';
+import { RecipientEditForm } from '@/features/recipients/components/recipient-edit-form';
+import { DocumentFieldEditForm } from '@/features/document-fields/components/document-field-edit-form';
 
 export default function DocumentDetailPage() {
   const { documentId } = useParams<{ documentId: string }>();
@@ -28,10 +28,8 @@ export default function DocumentDetailPage() {
   const recipients = useRecipientsQuery(documentId);
   const fields = useFieldsQuery(documentId);
   const deleteRecipient = useDeleteRecipientMutation(documentId);
-  const createField = useCreateFieldMutation(documentId);
   const deleteField = useDeleteFieldMutation(documentId);
   const send = useSendDocumentMutation(documentId);
-  const bulk = useBulkAssignFieldsMutation(documentId);
   const download = useDocumentDownloadMutation(documentId);
   const jobs = useDocumentJobsQuery(documentId, doc.data?.status === 'COMPLETED');
   useJobProgressStream({ jobId: jobs.data?.[0]?.id, documentId, accessToken, organizationId: org });
@@ -42,41 +40,11 @@ export default function DocumentDetailPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
-  if (doc.isLoading) {
-    return <main className="p-8">Loading document…</main>;
-  }
-  if (doc.isError || !doc.data) {
+  if (doc.isLoading) return <main className="p-8">Loading document…</main>;
+  if (doc.isError || !doc.data)
     return <main className="p-8 text-red-400">Unable to load document.</main>;
-  }
-
   const d = doc.data;
-
   const signers = recipients.data?.filter((r: any) => r.role === 'SIGNER') ?? [];
-
-  function addField(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const f = new FormData(form);
-    createField.mutate(
-      {
-        recipientId: String(f.get('recipientId')),
-        type: String(f.get('type')),
-        pageNumber: 1,
-        x: 0.1,
-        y: 0.1,
-        width: 0.28,
-        height: 0.07,
-        required: true,
-      },
-      {
-        onSuccess: () => {
-          form.reset();
-          setMessage('Field added.');
-        },
-      },
-    );
-  }
-
   return (
     <main className="mx-auto max-w-6xl p-8">
       <header className="rounded-2xl border border-cyan-300/20 bg-slate-950/60 p-7 shadow-2xl">
@@ -140,24 +108,28 @@ export default function DocumentDetailPage() {
           <RecipientForm documentId={documentId} onSuccess={() => setMessage('Recipient added.')} />
           <div className="mt-5 grid gap-2">
             {recipients.data?.map((r: any) => (
-              <div
-                key={r.id}
-                className="flex items-center justify-between rounded-lg border bg-slate-900/60 p-3"
-              >
-                <span>
-                  <strong>{r.name}</strong>
-                  <small className="ml-2 text-slate-400">{r.email}</small>
-                </span>
-                <span className="flex items-center gap-2 text-xs text-cyan-300">
-                  {r.role}
-                  <button
-                    type="button"
-                    onClick={() => deleteRecipient.mutate(r.id)}
-                    className="text-rose-300"
-                  >
-                    Remove
-                  </button>
-                </span>
+              <div key={r.id} className="rounded-lg border bg-slate-900/60 p-3">
+                <div className="flex items-center justify-between">
+                  <span>
+                    <strong>{r.name}</strong>
+                    <small className="ml-2 text-slate-400">{r.email}</small>
+                  </span>
+                  <span className="flex items-center gap-2 text-xs text-cyan-300">
+                    {r.role}
+                    <button
+                      type="button"
+                      onClick={() => deleteRecipient.mutate(r.id)}
+                      className="text-rose-300"
+                    >
+                      Remove
+                    </button>
+                  </span>
+                </div>
+                <RecipientEditForm
+                  documentId={documentId}
+                  recipient={r}
+                  onSuccess={() => setMessage('Recipient updated.')}
+                />
               </div>
             ))}
           </div>
@@ -167,91 +139,63 @@ export default function DocumentDetailPage() {
           <p className="mt-1 text-sm text-slate-400">
             Add simple fields now; visual placement editor follows next.
           </p>
-          <form onSubmit={addField} className="mt-5 grid gap-3">
-            <select required name="recipientId" className="rounded-lg border bg-slate-900 p-3">
-              <option value="">Assign signer…</option>
-              {signers.map((r: any) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-            <select name="type" className="rounded-lg border bg-slate-900 p-3">
-              <option value="SIGNATURE">Signature</option>
-              <option value="TEXT">Text</option>
-              <option value="DATE">Date</option>
-              <option value="CHECKBOX">Checkbox</option>
-            </select>
-            <button
-              disabled={createField.isPending || !signers.length}
-              className="rounded-lg border border-cyan-300/40 p-3 text-cyan-200"
-            >
-              {createField.isPending ? 'Adding…' : 'Add field'}
-            </button>
-          </form>
+          <DocumentFieldForm
+            documentId={documentId}
+            signers={signers}
+            onSuccess={() => setMessage('Field added.')}
+          />
           <div className="mt-5 grid gap-2">
             {fields.data?.map((f: any) => {
               const assignee = recipients.data?.find((r: any) => r.id === f.recipientId);
               return (
-                <label
-                  key={f.id}
-                  className="flex items-center gap-3 rounded-lg border bg-slate-900/60 p-3"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(f.id)}
-                    onChange={() =>
-                      setSelected(
-                        selected.includes(f.id)
-                          ? selected.filter((id) => id !== f.id)
-                          : [...selected, f.id],
-                      )
-                    }
-                  />
-                  <span className="flex flex-1 justify-between">
-                    <span>
-                      {f.type}{' '}
-                      <small className="text-slate-400">
-                        page {f.pageNumber} · {assignee?.name ?? 'Unassigned'}
-                      </small>
+                <div key={f.id} className="rounded-lg border bg-slate-900/60 p-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(f.id)}
+                      onChange={() =>
+                        setSelected(
+                          selected.includes(f.id)
+                            ? selected.filter((id) => id !== f.id)
+                            : [...selected, f.id],
+                        )
+                      }
+                    />
+                    <span className="flex flex-1 justify-between">
+                      <span>
+                        {f.type}{' '}
+                        <small className="text-slate-400">
+                          page {f.pageNumber} · {assignee?.name ?? 'Unassigned'}
+                        </small>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => deleteField.mutate(f.id)}
+                        className="text-xs text-rose-300"
+                      >
+                        Remove
+                      </button>
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => deleteField.mutate(f.id)}
-                      className="text-xs text-rose-300"
-                    >
-                      Remove
-                    </button>
-                  </span>
-                </label>
+                  </div>
+                  <DocumentFieldEditForm
+                    documentId={documentId}
+                    field={f}
+                    signers={signers}
+                    onSuccess={() => setMessage('Field updated.')}
+                  />
+                </div>
               );
             })}
           </div>
-          {selected.length > 0 && (
-            <select
-              className="mt-3 w-full rounded-lg border bg-slate-900 p-3"
-              defaultValue=""
-              onChange={(e) => {
-                if (e.target.value)
-                  bulk.mutate(
-                    { fieldIds: selected, recipientId: e.target.value },
-                    {
-                      onSuccess: () => {
-                        setSelected([]);
-                        setMessage('Fields reassigned.');
-                      },
-                    },
-                  );
-              }}
-            >
-              <option value="">Assign selected fields…</option>
-              {signers.map((r: any) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-          )}
+          <BulkAssignFieldsForm
+            documentId={documentId}
+            fieldIds={selected}
+            signers={signers}
+            onSuccess={() => {
+              setSelected([]);
+              setMessage('Fields reassigned.');
+            }}
+          />
         </section>
       </div>
       <section className="mt-6 rounded-2xl border border-violet-300/20 bg-gradient-to-r from-slate-950/80 to-violet-950/30 p-6">

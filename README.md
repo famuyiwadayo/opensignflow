@@ -123,7 +123,7 @@ bun run test
 bun run build
 ```
 
-See [Quality Gates](docs/quality-gates.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [Quality Gates](docs/quality-gates.md), [Code Formatting](docs/code-formatting.md), and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Documentation
 
@@ -133,6 +133,7 @@ See [Quality Gates](docs/quality-gates.md) and [CONTRIBUTING.md](CONTRIBUTING.md
 - [Error Codes](docs/error-codes.md)
 - [Database Workflow](docs/database-workflow.md)
 - [Configuration and Dependency Readiness](docs/configuration-and-dependency-readiness.md)
+- [Authentication and Session Lifecycle](docs/authentication-and-session-lifecycle.md)
 - [Recipient, Field, and Signing Workflow](docs/recipient-field-and-signing-workflow.md)
 - [Signing, Delivery, and Token-Security Architecture](docs/signing-delivery-architecture.md)
 - [Transactional Outbox Pattern](docs/transactional-outbox.md)

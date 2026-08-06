@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { ApiClientError } from '@/lib/api/client';
+import { registerSchema } from '@opensignflow/validation';
 import { useRegisterMutation } from '@/features/auth/use-auth-mutations';
 
 export default function RegisterPage() {
@@ -17,9 +18,6 @@ export default function RegisterPage() {
     },
   });
 
-  const text = (value: string, min: number, label: string) =>
-    value.trim().length >= min ? undefined : `${label} must be at least ${min} characters.`;
-
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
       <form
@@ -32,7 +30,15 @@ export default function RegisterPage() {
         <Link href="/">← Back home</Link>
         <h1 className="mt-6 text-2xl font-bold">Create your workspace</h1>
         <div className="mt-6 space-y-4">
-          <form.Field name="name" validators={{ onChange: ({ value }) => text(value, 2, 'Name') }}>
+          <form.Field
+            name="name"
+            validators={{
+              onChange: ({ value }) =>
+                registerSchema.shape.name.safeParse(value).success
+                  ? undefined
+                  : 'Name must be at least 2 characters.',
+            }}
+          >
             {(field) => (
               <label className="grid gap-2">
                 <span>Name</span>
@@ -51,7 +57,7 @@ export default function RegisterPage() {
             name="email"
             validators={{
               onChange: ({ value }) =>
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                registerSchema.shape.email.safeParse(value).success
                   ? undefined
                   : 'Enter a valid email address.',
             }}
@@ -73,7 +79,12 @@ export default function RegisterPage() {
           </form.Field>
           <form.Field
             name="password"
-            validators={{ onChange: ({ value }) => text(value, 8, 'Password') }}
+            validators={{
+              onChange: ({ value }) =>
+                registerSchema.shape.password.safeParse(value).success
+                  ? undefined
+                  : 'Password must be at least 8 characters.',
+            }}
           >
             {(field) => (
               <label className="grid gap-2">
