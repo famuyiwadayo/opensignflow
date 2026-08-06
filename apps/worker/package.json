@@ -22,6 +22,7 @@
     "@opensignflow/queue": "workspace:*",
     "@opensignflow/shared": "workspace:*",
     "@opensignflow/storage": "workspace:*",
+    "@opensignflow/validation": "workspace:*",
     "bullmq": "^5.81.2",
     "ioredis": "^5.11.1",
     "nodemailer": "^9.0.3",

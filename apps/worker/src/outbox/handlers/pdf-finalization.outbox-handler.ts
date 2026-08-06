@@ -5,8 +5,8 @@ import {
   QueueJobName,
   QueueName,
   type FinalizeCompletedDocumentOutboxPayload,
-  type OutboxPayloadEnvelope,
 } from '@opensignflow/shared';
+import { pdfFinalizationOutboxEnvelopeSchema } from '@opensignflow/validation';
 
 import type { OutboxEventHandler } from '../outbox-handler.interface';
 
@@ -24,22 +24,11 @@ export class PdfFinalizationOutboxHandler
   });
 
   parse(serializedPayload: string): FinalizeCompletedDocumentOutboxPayload {
-    const envelope = JSON.parse(serializedPayload) as OutboxPayloadEnvelope<
-      'FINALIZE_COMPLETED_DOCUMENT',
-      FinalizeCompletedDocumentOutboxPayload
-    >;
-
-    if (
-      envelope.version !== 1 ||
-      envelope.type !== this.type ||
-      !envelope.payload?.jobId ||
-      !envelope.payload?.documentId ||
-      !envelope.payload?.organizationId
-    ) {
+    const parsed = pdfFinalizationOutboxEnvelopeSchema.safeParse(JSON.parse(serializedPayload));
+    if (!parsed.success) {
       throw new Error('Invalid FINALIZE_COMPLETED_DOCUMENT outbox payload.');
     }
-
-    return envelope.payload;
+    return parsed.data.payload;
   }
 
   dispatch(input: { eventId: string; payload: FinalizeCompletedDocumentOutboxPayload }) {

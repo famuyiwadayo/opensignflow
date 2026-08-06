@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { ApiClientError } from '@/lib/api/client';
+import { loginSchema } from '@opensignflow/validation';
+
 import { useLoginMutation } from '@/features/auth/use-auth-mutations';
 
 export default function LoginPage() {
@@ -33,7 +35,7 @@ export default function LoginPage() {
             name="email"
             validators={{
               onChange: ({ value }) =>
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                loginSchema.shape.email.safeParse(value).success
                   ? undefined
                   : 'Enter a valid email address.',
             }}
@@ -48,16 +50,21 @@ export default function LoginPage() {
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="rounded border bg-slate-900 p-3"
                 />
+
                 {field.state.meta.errors[0] && (
                   <small className="text-red-300">{String(field.state.meta.errors[0])}</small>
                 )}
               </label>
             )}
           </form.Field>
+
           <form.Field
             name="password"
             validators={{
-              onChange: ({ value }) => (value.length ? undefined : 'Password is required.'),
+              onChange: ({ value }) =>
+                loginSchema.shape.password.safeParse(value).success
+                  ? undefined
+                  : 'Password is required.',
             }}
           >
             {(field) => (
@@ -76,12 +83,14 @@ export default function LoginPage() {
               </label>
             )}
           </form.Field>
+
           <button
             disabled={login.isPending}
             className="w-full rounded bg-cyan-300 p-3 font-semibold text-slate-950"
           >
             {login.isPending ? 'Logging in…' : 'Log in'}
           </button>
+
           {login.error && (
             <p className="text-sm text-red-300">
               {login.error instanceof ApiClientError
@@ -90,6 +99,7 @@ export default function LoginPage() {
             </p>
           )}
         </div>
+
         <p className="mt-6 text-sm">
           No account? <Link href="/auth/register">Register</Link>
         </p>
