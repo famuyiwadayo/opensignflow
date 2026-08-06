@@ -1,5 +1,5 @@
 import {
-  Body,
+  BadRequestException,
   Controller,
   Get,
   Headers,
@@ -23,7 +23,7 @@ import {
 import type { Request } from 'express';
 import { memoryStorage } from 'multer';
 
-import type { ListAuditEventsQueryDto } from '@/audit';
+import { ListAuditEventsQueryDto } from '@/audit';
 import { AuditEventEntity } from '@/audit';
 import { JwtAuthGuard } from '@/auth/guards';
 import {
@@ -31,13 +31,12 @@ import {
   ApiOkDataResponse,
   ApiPaginatedDataResponse,
   CurrentUser,
+  ValidatedBody,
+  ValidatedQuery,
   type AuthenticatedUser,
 } from '@/common';
-import type {
-  CreateDocumentDto,
-  DownloadUrlQueryDto,
-  ListDocumentsQueryDto,
-} from './dto';
+import { ListDocumentsQueryDto } from './dto';
+import { CreateDocumentDto } from './dto';
 import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
 import { DocumentsService } from './documents.service';
 import type { UploadedPdfFile } from './documents.service';
@@ -58,7 +57,7 @@ export class DocumentsController {
   async listDocuments(
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
-    @Query() query: ListDocumentsQueryDto,
+    @ValidatedQuery(ListDocumentsQueryDto) query: ListDocumentsQueryDto,
   ) {
     return this.documentsService.list({ user, organizationId, query });
   }
@@ -88,7 +87,7 @@ export class DocumentsController {
   async createDocument(
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
-    @Body() dto: CreateDocumentDto,
+    @ValidatedBody(CreateDocumentDto) dto: CreateDocumentDto,
     @UploadedFile() file: UploadedPdfFile | undefined,
     @Req() request: Request,
   ) {
@@ -115,7 +114,7 @@ export class DocumentsController {
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
-    @Query() query: ListAuditEventsQueryDto,
+    @ValidatedQuery(ListAuditEventsQueryDto) query: ListAuditEventsQueryDto,
   ) {
     return this.documentsService.listAuditEvents({
       user,
@@ -151,14 +150,27 @@ export class DocumentsController {
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
-    @Query() query: DownloadUrlQueryDto,
+    @Query('variant') variant: string | undefined,
+    @Query('disposition') disposition: string | undefined,
   ) {
+    if (variant && variant !== 'original' && variant !== 'completed') {
+      throw new BadRequestException('Download variant is invalid.');
+    }
+    if (
+      disposition &&
+      disposition !== 'attachment' &&
+      disposition !== 'inline'
+    ) {
+      throw new BadRequestException('Download disposition is invalid.');
+    }
+
     return {
       data: await this.documentsService.createDownloadUrl({
         user,
         organizationId,
         documentId,
-        variant: query.variant ?? 'original',
+        variant: variant === 'completed' ? 'completed' : 'original',
+        disposition: disposition === 'inline' ? 'inline' : 'attachment',
       }),
     };
   }

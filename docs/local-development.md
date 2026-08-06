@@ -34,16 +34,16 @@ docker compose up -d
 
 Local services:
 
-| Service | URL |
-|---|---|
-| Web | http://localhost:3000 |
-| API | http://localhost:4000 |
-| Swagger | http://localhost:4000/docs |
-| API health | http://localhost:4000/v1/health |
-| Mailpit | http://localhost:8025 |
-| MinIO Console | http://localhost:9001 |
-| Postgres | localhost:5432 |
-| Redis | localhost:6379 |
+| Service       | URL                             |
+| ------------- | ------------------------------- |
+| Web           | http://localhost:3000           |
+| API           | http://localhost:4000           |
+| Swagger       | http://localhost:4000/docs      |
+| API health    | http://localhost:4000/v1/health |
+| Mailpit       | http://localhost:8025           |
+| MinIO Console | http://localhost:9001           |
+| Postgres      | localhost:5432                  |
+| Redis         | localhost:6379                  |
 
 MinIO credentials:
 
@@ -64,7 +64,6 @@ cp apps/web/.env.example apps/web/.env.local
 ## Database
 
 See also: [Database Workflow](./database-workflow.md).
-
 
 After installing dependencies and starting Postgres, generate Prisma Client and apply committed migrations:
 
@@ -104,8 +103,6 @@ bun run db:reset
 ```
 
 Be careful: `db:reset` deletes local database data.
-
-
 
 ## Bun workspace binary note
 

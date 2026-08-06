@@ -1,6 +1,10 @@
 import 'reflect-metadata';
 
-import { HttpStatus, ValidationPipe, type INestApplication } from '@nestjs/common';
+import {
+  HttpStatus,
+  ValidationPipe,
+  type INestApplication,
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 
@@ -9,7 +13,9 @@ import { PrismaService } from '../database';
 import { QueueReadinessService, SigningEmailQueue } from '../jobs';
 
 /** Creates a production-aligned HTTP test app with explicit isolated infrastructure overrides. */
-export async function createTestApi(input: { database: unknown }): Promise<INestApplication> {
+export async function createTestApi(input: {
+  database: unknown;
+}): Promise<INestApplication> {
   // AppModule evaluates configuration at import time. Call this only after the
   // suite has supplied its isolated Testcontainers environment values.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -28,12 +34,14 @@ export async function createTestApi(input: { database: unknown }): Promise<INest
     .compile();
   const app = module.createNestApplication();
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    forbidNonWhitelisted: true,
-    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+    }),
+  );
   app.useGlobalFilters(new ApiExceptionFilter());
   await app.init();
   return app;

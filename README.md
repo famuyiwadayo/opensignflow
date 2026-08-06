@@ -57,17 +57,17 @@ It is being built as both a serious backend/frontend portfolio project and a pot
 
 ## Technology
 
-| Area | Choice |
-|---|---|
-| Monorepo | Turborepo + Bun workspaces |
-| Web | Next.js, TypeScript, Tailwind, TanStack tools |
-| API | NestJS + TypeScript |
-| Worker | NestJS application context + BullMQ consumers |
-| Database | PostgreSQL + Prisma 7 |
-| Queue | Redis + BullMQ |
-| Storage | S3-compatible storage, MinIO locally |
-| Email | Mailpit locally, Resend in production |
-| Tests | Jest + Testcontainers for PostgreSQL/Redis integration tests |
+| Area     | Choice                                                       |
+| -------- | ------------------------------------------------------------ |
+| Monorepo | Turborepo + Bun workspaces                                   |
+| Web      | Next.js, TypeScript, Tailwind, TanStack tools                |
+| API      | NestJS + TypeScript                                          |
+| Worker   | NestJS application context + BullMQ consumers                |
+| Database | PostgreSQL + Prisma 7                                        |
+| Queue    | Redis + BullMQ                                               |
+| Storage  | S3-compatible storage, MinIO locally                         |
+| Email    | Mailpit locally, Resend in production                        |
+| Tests    | Jest + Testcontainers for PostgreSQL/Redis integration tests |
 
 ## Repository structure
 

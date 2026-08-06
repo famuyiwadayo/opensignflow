@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -25,9 +24,10 @@ import {
   ApiCreatedDataResponse,
   ApiOkDataResponse,
   CurrentUser,
+  ValidatedBody,
   type AuthenticatedUser,
 } from '@/common';
-import type {
+import {
   BulkAssignDocumentFieldsDto,
   CreateDocumentFieldDto,
   UpdateDocumentFieldDto,
@@ -63,7 +63,7 @@ export class DocumentFieldsController {
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
-    @Body() dto: CreateDocumentFieldDto,
+    @ValidatedBody(CreateDocumentFieldDto) dto: CreateDocumentFieldDto,
     @Req() request: Request,
   ) {
     return {
@@ -86,7 +86,8 @@ export class DocumentFieldsController {
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
-    @Body() dto: BulkAssignDocumentFieldsDto,
+    @ValidatedBody(BulkAssignDocumentFieldsDto)
+    dto: BulkAssignDocumentFieldsDto,
     @Req() request: Request,
   ) {
     return this.fieldsService.bulkAssign({
@@ -106,7 +107,7 @@ export class DocumentFieldsController {
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
     @Param('fieldId') fieldId: string,
-    @Body() dto: UpdateDocumentFieldDto,
+    @ValidatedBody(UpdateDocumentFieldDto) dto: UpdateDocumentFieldDto,
     @Req() request: Request,
   ) {
     return {

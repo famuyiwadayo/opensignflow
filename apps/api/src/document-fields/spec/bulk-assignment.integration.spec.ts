@@ -65,18 +65,18 @@ describe('Document field bulk assignment integration', () => {
       user: { id: workflow.user.id, email: workflow.user.email },
       documentId: workflow.document.id,
       dto: {
-        fieldIds: workflow.fields.map((field) => field.id),
+        fieldIds: [workflow.fields[0].id],
         recipientId: workflow.signers[1].id,
       },
       context: {},
     });
 
-    expect(result.data).toHaveLength(workflow.fields.length);
-    expect(
-      result.data.every(
-        (field) => field.recipientId === workflow.signers[1].id,
-      ),
-    ).toBe(true);
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].recipientId).toBe(workflow.signers[1].id);
+    const unselected = await database.documentField.findUniqueOrThrow({
+      where: { id: workflow.fields[1].id },
+    });
+    expect(unselected.recipientId).toBe(workflow.signers[0].id);
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({
         metadata: expect.objectContaining({ operation: 'BULK_ASSIGNMENT' }),

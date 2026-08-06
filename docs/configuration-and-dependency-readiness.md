@@ -35,11 +35,11 @@ App-level `.env.example` files are migration pointers only. They are not local c
 
 `@opensignflow/config` finds the workspace root through its `package.json` workspaces declaration.
 
-| Environment | Authoritative source | Why |
-|---|---|---|
-| `development` | root `.env` | A single deterministic local configuration prevents API/worker drift and stale terminal exports. |
-| `test` | explicit test environment | Keeps runner-controlled values deterministic. |
-| `production` | deployment environment / secret manager | Prevents repository files from overriding deployment secrets. |
+| Environment   | Authoritative source                    | Why                                                                                              |
+| ------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `development` | root `.env`                             | A single deterministic local configuration prevents API/worker drift and stale terminal exports. |
+| `test`        | explicit test environment               | Keeps runner-controlled values deterministic.                                                    |
+| `production`  | deployment environment / secret manager | Prevents repository files from overriding deployment secrets.                                    |
 
 Development dotenv loading uses `override: true`, so a root `.env` value replaces inherited terminal exports. Test and production do not load local `.env` values over deployment configuration.
 

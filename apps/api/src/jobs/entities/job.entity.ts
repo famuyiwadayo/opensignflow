@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ProcessingStatus } from '@opensignflow/database';
+import { type JobRecord, ProcessingStatus } from '@opensignflow/database';
 
 export class JobEntity {
   @ApiProperty() id!: string;
@@ -12,7 +12,7 @@ export class JobEntity {
   @ApiProperty({ nullable: true }) completedAt!: string | null;
   @ApiProperty() createdAt!: string;
 
-  static fromPrisma(job: any): JobEntity {
+  static fromPrisma(job: JobRecord): JobEntity {
     return {
       id: job.id,
       status: job.status,

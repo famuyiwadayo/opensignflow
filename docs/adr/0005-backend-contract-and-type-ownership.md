@@ -14,14 +14,14 @@ However, blindly sharing types can make the codebase unsafe and redundant. Prism
 
 Use one source of truth per boundary:
 
-| Boundary | Source of truth |
-|---|---|
-| Persistence | Prisma schema and Prisma Client |
-| Request validation | NestJS DTOs |
-| API response contract | NestJS API entities |
-| API documentation | NestJS Swagger/OpenAPI |
-| Frontend API types | Generated OpenAPI client |
-| Generic envelopes/errors | Small shared package |
+| Boundary                 | Source of truth                 |
+| ------------------------ | ------------------------------- |
+| Persistence              | Prisma schema and Prisma Client |
+| Request validation       | NestJS DTOs                     |
+| API response contract    | NestJS API entities             |
+| API documentation        | NestJS Swagger/OpenAPI          |
+| Frontend API types       | Generated OpenAPI client        |
+| Generic envelopes/errors | Small shared package            |
 
 `packages/shared` must remain framework-agnostic and small. It should not contain NestJS DTOs, NestJS entities, Prisma types, manually duplicated API resources, or manually duplicated domain enums.
 

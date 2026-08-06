@@ -24,18 +24,18 @@ The signing workflow must provide the following properties:
 
 ## 2. Terms and responsibilities
 
-| Term | Meaning |
-|---|---|
-| **Document** | The workspace-owned PDF workflow resource. Its lifecycle starts in `DRAFT`. |
-| **Recipient** | A person invited to complete fields on a document. A document can have multiple recipients. |
-| **Document field** | A positioned signing/editor field, such as `SIGNATURE`, `TEXT`, or `DATE`, assigned to a document recipient. |
-| **Signing request** | The server-side authorization record for one recipient to sign one document. It is not the email itself. |
-| **Signing token** | A secret, random bearer credential embedded in a recipient’s signing link. Possession grants access only to that signing request’s public flow. |
-| **Signing link** | The web URL containing the plaintext signing token, for example `https://app.example.com/sign/<token>`. |
-| **Outbox event** | A durable database record created in the same transaction as business state. It guarantees later dispatch to asynchronous infrastructure. |
-| **Primary queue** | The BullMQ queue used for active signing-email work. |
-| **DLQ** | A dead-letter queue containing minimized operational information for jobs whose retry budget is exhausted. |
-| **Worker** | The separate process that dispatches outbox records and processes queue jobs. |
+| Term                | Meaning                                                                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Document**        | The workspace-owned PDF workflow resource. Its lifecycle starts in `DRAFT`.                                                                     |
+| **Recipient**       | A person invited to complete fields on a document. A document can have multiple recipients.                                                     |
+| **Document field**  | A positioned signing/editor field, such as `SIGNATURE`, `TEXT`, or `DATE`, assigned to a document recipient.                                    |
+| **Signing request** | The server-side authorization record for one recipient to sign one document. It is not the email itself.                                        |
+| **Signing token**   | A secret, random bearer credential embedded in a recipient’s signing link. Possession grants access only to that signing request’s public flow. |
+| **Signing link**    | The web URL containing the plaintext signing token, for example `https://app.example.com/sign/<token>`.                                         |
+| **Outbox event**    | A durable database record created in the same transaction as business state. It guarantees later dispatch to asynchronous infrastructure.       |
+| **Primary queue**   | The BullMQ queue used for active signing-email work.                                                                                            |
+| **DLQ**             | A dead-letter queue containing minimized operational information for jobs whose retry budget is exhausted.                                      |
+| **Worker**          | The separate process that dispatches outbox records and processes queue jobs.                                                                   |
 
 ### API responsibilities
 
@@ -130,12 +130,12 @@ A document may be sent only when all of these are true:
 
 The API returns these standardized errors where appropriate:
 
-| Condition | Error code |
-|---|---|
-| Document does not exist in active organization | `DOCUMENT_NOT_FOUND` |
-| Document is no longer editable | `DOCUMENT_NOT_EDITABLE` |
-| Document is already no longer a draft | `DOCUMENT_ALREADY_SENT` |
-| Recipient/field prerequisites are missing | `DOCUMENT_SEND_REQUIREMENTS_NOT_MET` |
+| Condition                                      | Error code                           |
+| ---------------------------------------------- | ------------------------------------ |
+| Document does not exist in active organization | `DOCUMENT_NOT_FOUND`                 |
+| Document is no longer editable                 | `DOCUMENT_NOT_EDITABLE`              |
+| Document is already no longer a draft          | `DOCUMENT_ALREADY_SENT`              |
+| Recipient/field prerequisites are missing      | `DOCUMENT_SEND_REQUIREMENTS_NOT_MET` |
 
 Once sent, recipient and field mutations are rejected. This prevents an owner from changing the signer, field layout, or signing requirements after a recipient has been invited.
 
@@ -204,7 +204,7 @@ The exact update from `PENDING` to `SENT` should eventually occur after successf
 For every signing request, OpenSignFlow generates a high-entropy random token:
 
 ```ts
-randomBytes(32).toString('base64url')
+randomBytes(32).toString('base64url');
 ```
 
 This produces a URL-safe, cryptographically random secret. It is not derived from user IDs, recipient IDs, timestamps, document IDs, or predictable values.
@@ -553,12 +553,7 @@ Only operational identifiers and safe failure data:
 
 ```ts
 {
-  originalJobId,
-  signingRequestId,
-  documentId,
-  recipientId,
-  failureReason,
-  failedAt
+  (originalJobId, signingRequestId, documentId, recipientId, failureReason, failedAt);
 }
 ```
 

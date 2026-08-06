@@ -349,23 +349,23 @@ Validation error example:
 
 ## Standard HTTP status codes
 
-| Status | Meaning |
-|---:|---|
-| 200 | Successful read/update/action with response body |
-| 201 | Resource created |
-| 202 | Accepted for async processing |
-| 204 | Success with no response body |
-| 400 | Malformed request or invalid query syntax |
-| 401 | Missing/invalid authentication |
-| 403 | Authenticated but not allowed |
-| 404 | Resource not found or intentionally hidden |
-| 409 | Conflict with current resource state |
-| 413 | Uploaded file too large |
-| 415 | Unsupported media type |
-| 422 | Semantic validation error |
-| 429 | Rate limit exceeded |
-| 500 | Unexpected server error |
-| 503 | Temporary service unavailable |
+| Status | Meaning                                          |
+| -----: | ------------------------------------------------ |
+|    200 | Successful read/update/action with response body |
+|    201 | Resource created                                 |
+|    202 | Accepted for async processing                    |
+|    204 | Success with no response body                    |
+|    400 | Malformed request or invalid query syntax        |
+|    401 | Missing/invalid authentication                   |
+|    403 | Authenticated but not allowed                    |
+|    404 | Resource not found or intentionally hidden       |
+|    409 | Conflict with current resource state             |
+|    413 | Uploaded file too large                          |
+|    415 | Unsupported media type                           |
+|    422 | Semantic validation error                        |
+|    429 | Rate limit exceeded                              |
+|    500 | Unexpected server error                          |
+|    503 | Temporary service unavailable                    |
 
 ## Standard error codes
 

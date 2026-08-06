@@ -275,7 +275,6 @@ Returns the document's immutable audit trail in descending event-time order. The
 }
 ```
 
-
 ## Recipients
 
 Recipients are managed only while the document status is `DRAFT`.

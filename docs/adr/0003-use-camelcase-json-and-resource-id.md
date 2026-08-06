@@ -11,13 +11,13 @@ The API contract needed a final decision on JSON field naming. One option consid
 Although kebab-case is valid JSON, this project uses a TypeScript-heavy stack: Next.js, NestJS, TanStack Query, TanStack Form, OpenAPI, and eventually a generated API client. Kebab-case JSON keys are inconvenient in TypeScript because they require bracket access:
 
 ```ts
-response.data["document-id"]
+response.data['document-id'];
 ```
 
 instead of normal property access:
 
 ```ts
-response.data.documentId
+response.data.documentId;
 ```
 
 ## Decision

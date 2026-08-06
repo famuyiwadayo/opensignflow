@@ -6,18 +6,18 @@ The frontend should be clean, accessible, type-safe, and easy to maintain. It sh
 
 ## Frontend stack
 
-| Concern | Tool |
-|---|---|
-| Framework | Next.js App Router |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| UI primitives | shadcn/ui |
-| Server state | TanStack Query |
-| Forms | TanStack Form |
-| Tables | TanStack Table |
-| Virtualized lists | TanStack Virtual where useful |
-| Validation | Zod |
-| PDF rendering | PDF.js / react-pdf exploration |
+| Concern           | Tool                             |
+| ----------------- | -------------------------------- |
+| Framework         | Next.js App Router               |
+| Language          | TypeScript                       |
+| Styling           | Tailwind CSS                     |
+| UI primitives     | shadcn/ui                        |
+| Server state      | TanStack Query                   |
+| Forms             | TanStack Form                    |
+| Tables            | TanStack Table                   |
+| Virtualized lists | TanStack Virtual where useful    |
+| Validation        | Zod                              |
+| PDF rendering     | PDF.js / react-pdf exploration   |
 | Signature capture | canvas-based signature component |
 
 ## TanStack decisions
@@ -40,12 +40,12 @@ Do not duplicate server state into global client stores unless there is a strong
 Recommended conventions:
 
 ```ts
-queryKeys.documents.list(filters)
-queryKeys.documents.detail(documentId)
-queryKeys.documents.fields(documentId)
-queryKeys.documents.recipients(documentId)
-queryKeys.documents.audit(documentId)
-queryKeys.ai.summary(documentId)
+queryKeys.documents.list(filters);
+queryKeys.documents.detail(documentId);
+queryKeys.documents.fields(documentId);
+queryKeys.documents.recipients(documentId);
+queryKeys.documents.audit(documentId);
+queryKeys.ai.summary(documentId);
 ```
 
 Mutations should invalidate or update the smallest useful query scope.
@@ -56,7 +56,7 @@ Example:
 onSuccess: () => {
   queryClient.invalidateQueries({ queryKey: queryKeys.documents.detail(documentId) });
   queryClient.invalidateQueries({ queryKey: queryKeys.documents.fields(documentId) });
-}
+};
 ```
 
 ### Use TanStack Form for forms

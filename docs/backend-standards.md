@@ -16,18 +16,16 @@ What we want to avoid is accidental manual duplication that drifts over time.
 
 ## Source-of-truth map
 
-| Concern | Source of truth | Consumed by |
-|---|---|---|
-| Database schema | `packages/database/prisma/schema.prisma` | Prisma Client/backend only |
-| Backend request validation | NestJS DTO classes | Controllers, Swagger/OpenAPI |
-| API response contract | NestJS API entity classes | Controllers, Swagger/OpenAPI |
-| Frontend API types | Generated from OpenAPI | Next.js frontend |
-| Frontend server state | TanStack Query hooks | UI components |
-| Frontend form UX validation | Local form schemas, typed from generated request types where possible | TanStack Form |
-| Business limits/pricing | Backend config exposed through API | Frontend fetches through API |
-| Generic envelopes/errors | Small shared package or generated API client | Backend/frontend |
-
-
+| Concern                     | Source of truth                                                       | Consumed by                  |
+| --------------------------- | --------------------------------------------------------------------- | ---------------------------- |
+| Database schema             | `packages/database/prisma/schema.prisma`                              | Prisma Client/backend only   |
+| Backend request validation  | NestJS DTO classes                                                    | Controllers, Swagger/OpenAPI |
+| API response contract       | NestJS API entity classes                                             | Controllers, Swagger/OpenAPI |
+| Frontend API types          | Generated from OpenAPI                                                | Next.js frontend             |
+| Frontend server state       | TanStack Query hooks                                                  | UI components                |
+| Frontend form UX validation | Local form schemas, typed from generated request types where possible | TanStack Form                |
+| Business limits/pricing     | Backend config exposed through API                                    | Frontend fetches through API |
+| Generic envelopes/errors    | Small shared package or generated API client                          | Backend/frontend             |
 
 ## Workspace script binary convention
 
@@ -337,10 +335,10 @@ Rules:
 Useful NestJS mapped type helpers:
 
 ```ts
-PartialType()
-PickType()
-OmitType()
-IntersectionType()
+PartialType();
+PickType();
+OmitType();
+IntersectionType();
 ```
 
 Example:
@@ -455,9 +453,9 @@ Why manual envelopes for now:
 Later, we may add helper functions:
 
 ```ts
-ok(data)
-paginated(data, pagination)
-accepted(job, meta)
+ok(data);
+paginated(data, pagination);
+accepted(job, meta);
 ```
 
 We should not add a global response-wrapping interceptor until the response patterns are stable.
@@ -491,7 +489,6 @@ Expected decorators:
 ```
 
 This keeps controller signatures clean.
-
 
 ## Error codes
 

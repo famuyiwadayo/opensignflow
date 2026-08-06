@@ -24,7 +24,10 @@ export async function probeQueueReadiness(input: {
     await Promise.race([
       connection.connect(),
       new Promise<never>((_, reject) => {
-        timeout = setTimeout(() => reject(new Error(`Redis probe timed out after ${timeoutMs}ms.`)), timeoutMs);
+        timeout = setTimeout(
+          () => reject(new Error(`Redis probe timed out after ${timeoutMs}ms.`)),
+          timeoutMs,
+        );
       }),
     ]);
     await connection.ping();
@@ -36,7 +39,9 @@ export async function probeQueueReadiness(input: {
       reason: error instanceof Error ? error.message : 'Unknown Redis readiness failure.',
     };
   } finally {
-    if (timeout) {clearTimeout(timeout);}
+    if (timeout) {
+      clearTimeout(timeout);
+    }
     connection.disconnect();
   }
 }

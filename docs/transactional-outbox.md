@@ -379,12 +379,12 @@ This is required before production-scale worker replicas.
 
 ## 9. Status meaning
 
-| Outbox status | Meaning |
-|---|---|
-| `PENDING` | Durable dispatch work exists and can be claimed. |
-| `PROCESSING` | One worker currently holds a lease/claim. |
-| `DISPATCHED` | The matching handler successfully handed work to its downstream mechanism, usually BullMQ. |
-| `FAILED` | Dispatch attempts were exhausted or a non-recoverable failure occurred. |
+| Outbox status | Meaning                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| `PENDING`     | Durable dispatch work exists and can be claimed.                                           |
+| `PROCESSING`  | One worker currently holds a lease/claim.                                                  |
+| `DISPATCHED`  | The matching handler successfully handed work to its downstream mechanism, usually BullMQ. |
+| `FAILED`      | Dispatch attempts were exhausted or a non-recoverable failure occurred.                    |
 
 `DISPATCHED` does not mean email inbox delivery succeeded. It means:
 

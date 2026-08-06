@@ -26,6 +26,25 @@ import { JobsService } from './jobs.service';
 export class JobsController {
   constructor(@Inject(JobsService) private readonly jobs: JobsService) {}
 
+  @Get('document/:documentId')
+  @ApiOperation({
+    summary: 'List document jobs and durable progress snapshots',
+  })
+  @ApiOkDataResponse(JobEntity, { isArray: true })
+  async listForDocument(
+    @CurrentUser() user: AuthenticatedUser,
+    @Headers('x-organization-id') organizationId: string | undefined,
+    @Param('documentId') documentId: string,
+  ) {
+    return {
+      data: await this.jobs.listForDocument({
+        user,
+        organizationId,
+        documentId,
+      }),
+    };
+  }
+
   @Get(':jobId')
   @ApiOperation({ summary: 'Get durable job progress snapshot' })
   @ApiOkDataResponse(JobEntity)

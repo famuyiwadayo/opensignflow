@@ -19,59 +19,59 @@ The source of truth during implementation will be NestJS controllers plus the ge
 
 ## Legend
 
-| Column | Meaning |
-|---|---|
-| Auth | `User` means logged-in user, `PublicToken` means signing token, `Public` means no auth |
-| MVP | `Yes` for first complete release, `Later` for post-MVP |
-| Idem | Should support `Idempotency-Key` |
-| Audit | Should create an audit event |
+| Column | Meaning                                                                                |
+| ------ | -------------------------------------------------------------------------------------- |
+| Auth   | `User` means logged-in user, `PublicToken` means signing token, `Public` means no auth |
+| MVP    | `Yes` for first complete release, `Later` for post-MVP                                 |
+| Idem   | Should support `Idempotency-Key`                                                       |
+| Audit  | Should create an audit event                                                           |
 
 ## Health
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/health` | Public | Yes | No | No | Infrastructure health check |
-| GET | `/v1/health` | Public | Optional | No | No | Versioned API health check |
+| Method | Path         | Auth   | MVP      | Idem | Audit | Purpose                     |
+| ------ | ------------ | ------ | -------- | ---- | ----- | --------------------------- |
+| GET    | `/health`    | Public | Yes      | No   | No    | Infrastructure health check |
+| GET    | `/v1/health` | Public | Optional | No   | No    | Versioned API health check  |
 
 ## Auth
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| POST | `/v1/auth/register` | Public | Yes | Optional | Optional | Create user and default personal organization |
-| POST | `/v1/auth/login` | Public | Yes | No | Optional | Authenticate and create session |
-| POST | `/v1/auth/refresh` | Refresh cookie | Yes | No | No | Rotate/refresh access token |
-| POST | `/v1/auth/logout` | User | Yes | Yes | Optional | Revoke current session |
-| GET | `/v1/auth/me` | User | Yes | No | No | Return current user and active organization context |
+| Method | Path                | Auth           | MVP | Idem     | Audit    | Purpose                                             |
+| ------ | ------------------- | -------------- | --- | -------- | -------- | --------------------------------------------------- |
+| POST   | `/v1/auth/register` | Public         | Yes | Optional | Optional | Create user and default personal organization       |
+| POST   | `/v1/auth/login`    | Public         | Yes | No       | Optional | Authenticate and create session                     |
+| POST   | `/v1/auth/refresh`  | Refresh cookie | Yes | No       | No       | Rotate/refresh access token                         |
+| POST   | `/v1/auth/logout`   | User           | Yes | Yes      | Optional | Revoke current session                              |
+| GET    | `/v1/auth/me`       | User           | Yes | No       | No       | Return current user and active organization context |
 
 ## Organizations / workspaces
 
 MVP can create a default personal organization on registration and hide most organization UI.
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/organizations` | User | Yes | No | No | List organizations the user belongs to |
-| GET | `/v1/organizations/{organizationId}` | User | Later | No | No | Get organization details |
-| PATCH | `/v1/organizations/{organizationId}` | User | Later | No | Yes | Update organization name/settings |
-| GET | `/v1/organizations/{organizationId}/members` | User | Later | No | No | List members |
-| POST | `/v1/organizations/{organizationId}/invitations` | User | Later | Yes | Yes | Invite team member |
-| DELETE | `/v1/organizations/{organizationId}/members/{memberId}` | User | Later | Yes | Yes | Remove team member |
+| Method | Path                                                    | Auth | MVP   | Idem | Audit | Purpose                                |
+| ------ | ------------------------------------------------------- | ---- | ----- | ---- | ----- | -------------------------------------- |
+| GET    | `/v1/organizations`                                     | User | Yes   | No   | No    | List organizations the user belongs to |
+| GET    | `/v1/organizations/{organizationId}`                    | User | Later | No   | No    | Get organization details               |
+| PATCH  | `/v1/organizations/{organizationId}`                    | User | Later | No   | Yes   | Update organization name/settings      |
+| GET    | `/v1/organizations/{organizationId}/members`            | User | Later | No   | No    | List members                           |
+| POST   | `/v1/organizations/{organizationId}/invitations`        | User | Later | Yes  | Yes   | Invite team member                     |
+| DELETE | `/v1/organizations/{organizationId}/members/{memberId}` | User | Later | Yes  | Yes   | Remove team member                     |
 
 ## Documents
 
 Implemented first slice: see [Documents Module](./documents-module.md).
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/documents` | User | Yes | No | No | List documents with cursor pagination |
-| POST | `/v1/documents` | User | Yes | Yes | Yes | Create document by uploading PDF with multipart form data |
-| GET | `/v1/documents/{documentId}` | User | Yes | No | No | Get document details |
-| GET | `/v1/documents/{documentId}/audit-events` | User | Yes | No | No | List immutable audit events for a document |
-| PATCH | `/v1/documents/{documentId}` | User | Yes | No | Yes | Update title or editable metadata |
-| DELETE | `/v1/documents/{documentId}` | User | Yes | Yes | Yes | Soft-delete draft/cancelled document |
-| POST | `/v1/documents/{documentId}/send` | User | Yes | Yes | Yes | Send document to recipients |
-| POST | `/v1/documents/{documentId}/cancel` | User | Yes | Yes | Yes | Cancel a non-completed signing workflow |
-| GET | `/v1/documents/{documentId}/download-url?variant=original` | User | Yes | No | Optional | Get signed URL for original PDF |
-| GET | `/v1/documents/{documentId}/download-url?variant=completed` | User | Yes | No | Optional | Get signed URL for completed PDF |
+| Method | Path                                                        | Auth | MVP | Idem | Audit    | Purpose                                                   |
+| ------ | ----------------------------------------------------------- | ---- | --- | ---- | -------- | --------------------------------------------------------- |
+| GET    | `/v1/documents`                                             | User | Yes | No   | No       | List documents with cursor pagination                     |
+| POST   | `/v1/documents`                                             | User | Yes | Yes  | Yes      | Create document by uploading PDF with multipart form data |
+| GET    | `/v1/documents/{documentId}`                                | User | Yes | No   | No       | Get document details                                      |
+| GET    | `/v1/documents/{documentId}/audit-events`                   | User | Yes | No   | No       | List immutable audit events for a document                |
+| PATCH  | `/v1/documents/{documentId}`                                | User | Yes | No   | Yes      | Update title or editable metadata                         |
+| DELETE | `/v1/documents/{documentId}`                                | User | Yes | Yes  | Yes      | Soft-delete draft/cancelled document                      |
+| POST   | `/v1/documents/{documentId}/send`                           | User | Yes | Yes  | Yes      | Send document to recipients                               |
+| POST   | `/v1/documents/{documentId}/cancel`                         | User | Yes | Yes  | Yes      | Cancel a non-completed signing workflow                   |
+| GET    | `/v1/documents/{documentId}/download-url?variant=original`  | User | Yes | No   | Optional | Get signed URL for original PDF                           |
+| GET    | `/v1/documents/{documentId}/download-url?variant=completed` | User | Yes | No   | Optional | Get signed URL for completed PDF                          |
 
 ### `POST /v1/documents` MVP request
 
@@ -102,13 +102,13 @@ Success:
 
 ## Document fields
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/documents/{documentId}/fields` | User | Yes | No | No | List fields for editor |
-| POST | `/v1/documents/{documentId}/fields` | User | Yes | Optional | Yes | Create one field |
-| PUT | `/v1/documents/{documentId}/fields` | User | Later | Yes | Yes | Replace full field collection for autosave/batch save |
-| PATCH | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes | No | Yes | Update a field |
-| DELETE | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes | Yes | Yes | Delete a field |
+| Method | Path                                          | Auth | MVP   | Idem     | Audit | Purpose                                               |
+| ------ | --------------------------------------------- | ---- | ----- | -------- | ----- | ----------------------------------------------------- |
+| GET    | `/v1/documents/{documentId}/fields`           | User | Yes   | No       | No    | List fields for editor                                |
+| POST   | `/v1/documents/{documentId}/fields`           | User | Yes   | Optional | Yes   | Create one field                                      |
+| PUT    | `/v1/documents/{documentId}/fields`           | User | Later | Yes      | Yes   | Replace full field collection for autosave/batch save |
+| PATCH  | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes   | No       | Yes   | Update a field                                        |
+| DELETE | `/v1/documents/{documentId}/fields/{fieldId}` | User | Yes   | Yes      | Yes   | Delete a field                                        |
 
 ### Field create request
 
@@ -128,12 +128,12 @@ Success:
 
 ## Recipients
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/documents/{documentId}/recipients` | User | Yes | No | No | List recipients |
-| POST | `/v1/documents/{documentId}/recipients` | User | Yes | Optional | Yes | Create recipient |
-| PATCH | `/v1/documents/{documentId}/recipients/{recipientId}` | User | Yes | No | Yes | Update recipient while document is draft |
-| DELETE | `/v1/documents/{documentId}/recipients/{recipientId}` | User | Yes | Yes | Yes | Delete recipient while document is draft |
+| Method | Path                                                  | Auth | MVP | Idem     | Audit | Purpose                                  |
+| ------ | ----------------------------------------------------- | ---- | --- | -------- | ----- | ---------------------------------------- |
+| GET    | `/v1/documents/{documentId}/recipients`               | User | Yes | No       | No    | List recipients                          |
+| POST   | `/v1/documents/{documentId}/recipients`               | User | Yes | Optional | Yes   | Create recipient                         |
+| PATCH  | `/v1/documents/{documentId}/recipients/{recipientId}` | User | Yes | No       | Yes   | Update recipient while document is draft |
+| DELETE | `/v1/documents/{documentId}/recipients/{recipientId}` | User | Yes | Yes      | Yes   | Delete recipient while document is draft |
 
 ### Recipient create request
 
@@ -147,12 +147,12 @@ Success:
 
 ## Public signing
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/signing-requests/{token}` | PublicToken | Yes | No | Optional | Get signing request data for recipient |
-| POST | `/v1/signing-requests/{token}/viewed` | PublicToken | Yes | Yes | Yes | Mark request as viewed |
-| POST | `/v1/signing-requests/{token}/submit` | PublicToken | Yes | Yes | Yes | Submit field values and signatures |
-| POST | `/v1/signing-requests/{token}/decline` | PublicToken | Later | Yes | Yes | Recipient declines to sign |
+| Method | Path                                   | Auth        | MVP   | Idem | Audit    | Purpose                                |
+| ------ | -------------------------------------- | ----------- | ----- | ---- | -------- | -------------------------------------- |
+| GET    | `/v1/signing-requests/{token}`         | PublicToken | Yes   | No   | Optional | Get signing request data for recipient |
+| POST   | `/v1/signing-requests/{token}/viewed`  | PublicToken | Yes   | Yes  | Yes      | Mark request as viewed                 |
+| POST   | `/v1/signing-requests/{token}/submit`  | PublicToken | Yes   | Yes  | Yes      | Submit field values and signatures     |
+| POST   | `/v1/signing-requests/{token}/decline` | PublicToken | Later | Yes  | Yes      | Recipient declines to sign             |
 
 ### Signing request response should not leak unnecessary data
 
@@ -180,21 +180,21 @@ Return only what the signer needs:
 
 ## Audit
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/documents/{documentId}/audit-events` | User | Yes | No | No | List audit events for a document |
-| GET | `/v1/audit-events` | User | Later | No | No | Organization-wide audit trail |
+| Method | Path                                      | Auth | MVP   | Idem | Audit | Purpose                          |
+| ------ | ----------------------------------------- | ---- | ----- | ---- | ----- | -------------------------------- |
+| GET    | `/v1/documents/{documentId}/audit-events` | User | Yes   | No   | No    | List audit events for a document |
+| GET    | `/v1/audit-events`                        | User | Later | No   | No    | Organization-wide audit trail    |
 
 ## AI
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| POST | `/v1/documents/{documentId}/ai/summary` | User | Yes | Yes | Yes | Queue or generate AI document summary |
-| GET | `/v1/documents/{documentId}/ai/summary` | User | Yes | No | No | Get latest AI summary |
-| POST | `/v1/documents/{documentId}/ai/field-suggestions` | User | Yes | Yes | Yes | Queue or generate AI field suggestions |
-| GET | `/v1/documents/{documentId}/ai/field-suggestions` | User | Yes | No | No | Get latest field suggestions |
-| POST | `/v1/documents/{documentId}/ai/email-draft` | User | Yes | Yes | Optional | Generate signing email draft |
-| POST | `/v1/documents/{documentId}/ai/risk-check` | User | Later | Yes | Yes | Generate informational risk highlights |
+| Method | Path                                              | Auth | MVP   | Idem | Audit    | Purpose                                |
+| ------ | ------------------------------------------------- | ---- | ----- | ---- | -------- | -------------------------------------- |
+| POST   | `/v1/documents/{documentId}/ai/summary`           | User | Yes   | Yes  | Yes      | Queue or generate AI document summary  |
+| GET    | `/v1/documents/{documentId}/ai/summary`           | User | Yes   | No   | No       | Get latest AI summary                  |
+| POST   | `/v1/documents/{documentId}/ai/field-suggestions` | User | Yes   | Yes  | Yes      | Queue or generate AI field suggestions |
+| GET    | `/v1/documents/{documentId}/ai/field-suggestions` | User | Yes   | No   | No       | Get latest field suggestions           |
+| POST   | `/v1/documents/{documentId}/ai/email-draft`       | User | Yes   | Yes  | Optional | Generate signing email draft           |
+| POST   | `/v1/documents/{documentId}/ai/risk-check`        | User | Later | Yes  | Yes      | Generate informational risk highlights |
 
 ### Async AI response
 
@@ -220,32 +220,32 @@ Longer AI tasks should return:
 
 ## Jobs
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/jobs/{jobId}` | User | Yes | No | No | Poll background job status |
+| Method | Path               | Auth | MVP | Idem | Audit | Purpose                    |
+| ------ | ------------------ | ---- | --- | ---- | ----- | -------------------------- |
+| GET    | `/v1/jobs/{jobId}` | User | Yes | No   | No    | Poll background job status |
 
 ## Billing and usage
 
 Billing can be delayed until after the signing MVP works, but the endpoint shape should be planned now.
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| GET | `/v1/billing/plans` | Public | Later | No | No | List public SaaS plans |
-| GET | `/v1/billing/subscription` | User | Later | No | No | Get current organization subscription |
-| POST | `/v1/billing/checkout-sessions` | User | Later | Yes | Yes | Start subscription checkout |
-| POST | `/v1/billing/portal-sessions` | User | Later | Yes | Optional | Create billing management portal session |
-| GET | `/v1/usage/current-period` | User | Later | No | No | Get current usage against plan limits |
+| Method | Path                            | Auth   | MVP   | Idem | Audit    | Purpose                                  |
+| ------ | ------------------------------- | ------ | ----- | ---- | -------- | ---------------------------------------- |
+| GET    | `/v1/billing/plans`             | Public | Later | No   | No       | List public SaaS plans                   |
+| GET    | `/v1/billing/subscription`      | User   | Later | No   | No       | Get current organization subscription    |
+| POST   | `/v1/billing/checkout-sessions` | User   | Later | Yes  | Yes      | Start subscription checkout              |
+| POST   | `/v1/billing/portal-sessions`   | User   | Later | Yes  | Optional | Create billing management portal session |
+| GET    | `/v1/usage/current-period`      | User   | Later | No   | No       | Get current usage against plan limits    |
 
 ## Provider webhooks
 
 Provider webhooks may live outside `/v1` because they are not customer-facing REST endpoints.
 
-| Method | Path | Auth | MVP | Idem | Audit | Purpose |
-|---|---|---|---|---|---|---|
-| POST | `/webhooks/paystack` | Provider signature | Later | Yes | Yes | Paystack events |
-| POST | `/webhooks/flutterwave` | Provider signature | Later | Yes | Yes | Flutterwave events |
-| POST | `/webhooks/paddle` | Provider signature | Later | Yes | Yes | Paddle events |
-| POST | `/webhooks/resend` | Provider signature | Later | Optional | Optional | Email delivery events |
+| Method | Path                    | Auth               | MVP   | Idem     | Audit    | Purpose               |
+| ------ | ----------------------- | ------------------ | ----- | -------- | -------- | --------------------- |
+| POST   | `/webhooks/paystack`    | Provider signature | Later | Yes      | Yes      | Paystack events       |
+| POST   | `/webhooks/flutterwave` | Provider signature | Later | Yes      | Yes      | Flutterwave events    |
+| POST   | `/webhooks/paddle`      | Provider signature | Later | Yes      | Yes      | Paddle events         |
+| POST   | `/webhooks/resend`      | Provider signature | Later | Optional | Optional | Email delivery events |
 
 ## Endpoint implementation order
 

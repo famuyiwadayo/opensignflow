@@ -38,6 +38,11 @@ export class PublicSigningController {
     };
   }
 
+  @Get(':token/document-url')
+  async documentUrl(@Param('token') token: string) {
+    return { data: await this.signing.createDocumentUrl(token) };
+  }
+
   @Get(':token')
   @ApiOperation({
     summary: 'Get public signing request details for a valid signing token',

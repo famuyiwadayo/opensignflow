@@ -8,8 +8,9 @@ export class WorkerPrismaService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl)
-      {throw new Error('DATABASE_URL is required to initialize worker database access.');}
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL is required to initialize worker database access.');
+    }
     this.client = createPrismaClient({ databaseUrl, nodeEnv: process.env.NODE_ENV });
   }
 

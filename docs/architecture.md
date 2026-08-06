@@ -174,15 +174,15 @@ MinIO:    http://localhost:9001
 
 Suggested low-cost production setup:
 
-| Component | Possible provider |
-|---|---|
-| Web | Vercel |
-| API | Render, Railway, Fly.io, DigitalOcean, or VPS |
-| Database | Neon, Supabase, Railway, or managed Postgres |
-| Redis | Upstash or managed Redis |
-| Storage | Cloudflare R2 or S3-compatible storage |
-| Email | Resend |
-| Payments | Paystack, Flutterwave, Paddle, Lemon Squeezy, or Stripe depending on availability |
+| Component | Possible provider                                                                 |
+| --------- | --------------------------------------------------------------------------------- |
+| Web       | Vercel                                                                            |
+| API       | Render, Railway, Fly.io, DigitalOcean, or VPS                                     |
+| Database  | Neon, Supabase, Railway, or managed Postgres                                      |
+| Redis     | Upstash or managed Redis                                                          |
+| Storage   | Cloudflare R2 or S3-compatible storage                                            |
+| Email     | Resend                                                                            |
+| Payments  | Paystack, Flutterwave, Paddle, Lemon Squeezy, or Stripe depending on availability |
 
 ## Security principles
 
