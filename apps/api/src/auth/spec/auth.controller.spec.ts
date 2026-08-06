@@ -148,8 +148,11 @@ describe('AuthController refresh cookie contract', () => {
         expect.objectContaining({ secure: true }),
       );
     } finally {
-      if (previous === undefined) {delete process.env.NODE_ENV;}
-      else {process.env.NODE_ENV = previous;}
+      if (previous === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = previous;
+      }
     }
   });
 });

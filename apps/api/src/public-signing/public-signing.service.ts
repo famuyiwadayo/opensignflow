@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   AuditActorType,
   AuditEventType,
@@ -18,13 +19,13 @@ import { apiError, ErrorCode, IdGeneratorService } from '@/common';
 import { PrismaService } from '@/database';
 import type { SubmitSigningRequestDto } from './dto';
 import type { PublicSigningRequestEntity } from './entities/signing-request.entity';
-import { ConfigService } from '@nestjs/config';
-import {
-  isTypedNameSignatureValue,
-  type FinalizeCompletedDocumentOutboxPayload,
-  type OutboxPayloadEnvelope,
+import type {
+  FinalizeCompletedDocumentOutboxPayload,
+  OutboxPayloadEnvelope,
 } from '@opensignflow/shared';
 import { encryptPayload } from '@opensignflow/crypto';
+import { validateSigningFieldValue } from '@opensignflow/validation';
+import { StorageService } from '@/storage';
 
 @Injectable()
 export class PublicSigningService {
@@ -33,6 +34,7 @@ export class PublicSigningService {
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(IdGeneratorService) private readonly ids: IdGeneratorService,
     @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(StorageService) private readonly storage: StorageService,
   ) {}
 
   async getByToken(
@@ -125,6 +127,58 @@ export class PublicSigningService {
       })),
     };
   }
+
+  async createDocumentUrl(token: string) {
+    const request = await this.prisma.signingRequest.findUnique({
+      where: { tokenHash: this.hash(token) },
+      include: { document: true },
+    });
+
+    if (!request) {
+      throw new NotFoundException(
+        apiError(
+          ErrorCode.SIGNING_REQUEST_NOT_FOUND,
+          'Signing request was not found.',
+        ),
+      );
+    }
+
+    if (request.status === SigningRequestStatus.REVOKED) {
+      throw new UnauthorizedException(
+        apiError(
+          ErrorCode.SIGNING_REQUEST_REVOKED,
+          'Signing request is no longer active.',
+        ),
+      );
+    }
+
+    if (request.expiresAt <= new Date()) {
+      throw new UnauthorizedException(
+        apiError(ErrorCode.SIGNING_TOKEN_EXPIRED, 'Signing link has expired.'),
+      );
+    }
+
+    if (request.status === SigningRequestStatus.COMPLETED) {
+      throw new UnauthorizedException(
+        apiError(
+          ErrorCode.SIGNING_ALREADY_SUBMITTED,
+          'Signing request has already been completed.',
+        ),
+      );
+    }
+
+    return {
+      url: await this.storage.createSignedDownloadUrl({
+        key: request.document.originalStorageKey,
+        // causes the browser to trigger file download
+        // fileName: request.document.originalFileName,
+        contentType: request.document.mimeType,
+        expiresInSeconds: 300,
+      }),
+      expiresAt: new Date(Date.now() + 300_000).toISOString(),
+    };
+  }
+
   async submit(
     token: string,
     dto: SubmitSigningRequestDto,
@@ -187,8 +241,10 @@ export class PublicSigningService {
         ),
       );
     }
+
     for (const submittedValue of dto.values) {
       const field = allowed.get(submittedValue.fieldId);
+
       if (!field) {
         throw new UnprocessableEntityException(
           apiError(
@@ -197,7 +253,10 @@ export class PublicSigningService {
           ),
         );
       }
-      if (!this.isValidFieldValue(field.type, submittedValue.value)) {
+
+      if (
+        !validateSigningFieldValue(field.type, submittedValue.value).success
+      ) {
         throw new UnprocessableEntityException(
           apiError(
             ErrorCode.SIGNING_SUBMISSION_INVALID,
@@ -206,6 +265,7 @@ export class PublicSigningService {
         );
       }
     }
+
     await this.prisma.$transaction(async (tx) => {
       const submission = await tx.signingSubmission.create({
         data: {
@@ -281,6 +341,7 @@ export class PublicSigningService {
             resourceId: request.documentId,
           },
         });
+
         const payload: OutboxPayloadEnvelope<
           'FINALIZE_COMPLETED_DOCUMENT',
           FinalizeCompletedDocumentOutboxPayload
@@ -293,6 +354,7 @@ export class PublicSigningService {
             organizationId: request.document.organizationId,
           },
         };
+
         const encrypted = encryptPayload({
           plaintext: JSON.stringify(payload),
           base64Key: this.config.getOrThrow<string>('OUTBOX_ENCRYPTION_KEY'),
@@ -314,29 +376,6 @@ export class PublicSigningService {
       }
     });
     return { success: true };
-  }
-
-  private isValidFieldValue(type: string, value: unknown): boolean {
-    if (type === 'SIGNATURE') {
-      return isTypedNameSignatureValue(value);
-    }
-    if (type === 'CHECKBOX') {
-      return typeof value === 'boolean';
-    }
-    if (type === 'DATE') {
-      return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
-    }
-    if (type === 'TEXT') {
-      return typeof value === 'string' && value.length <= 2000;
-    }
-    if (type === 'INITIALS') {
-      return (
-        typeof value === 'string' &&
-        value.trim().length > 0 &&
-        value.length <= 12
-      );
-    }
-    return false;
   }
 
   private hash(token: string) {

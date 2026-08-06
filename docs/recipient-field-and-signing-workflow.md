@@ -325,19 +325,19 @@ SSE is preferred before WebSockets because owner activity is server-to-browser c
 
 ## 10. Future workflow conjectures and prepared boundaries
 
-| Scenario | Prepared now | Deferred work |
-|---|---|---|
-| Multiple fields per signer | Field-to-recipient relation | Public field submission |
-| Multiple signers on a page | Independent positioned fields | PDF editor rendering |
-| Bulk assignment | Planned narrow batch endpoint | UI multi-select |
-| Sequential signing | `signingOrder` persisted | document signing mode + unlock logic |
-| CC recipients | Explicit role model | informational notification templates |
-| Resend link | SigningRequest distinct from Recipient | revoke/reissue endpoint |
-| Expiration | `expiresAt` exists | expiration worker/sweep |
-| Decline | Audit/event vocabulary exists | public decline endpoint/reason |
-| Recipient replacement | Draft-only mutation rule | revoke/reissue workflow |
-| Live activity | Audit timeline | SSE relay |
-| Concurrent editor changes | Full replace deferred | revision/If-Match strategy |
+| Scenario                   | Prepared now                           | Deferred work                        |
+| -------------------------- | -------------------------------------- | ------------------------------------ |
+| Multiple fields per signer | Field-to-recipient relation            | Public field submission              |
+| Multiple signers on a page | Independent positioned fields          | PDF editor rendering                 |
+| Bulk assignment            | Planned narrow batch endpoint          | UI multi-select                      |
+| Sequential signing         | `signingOrder` persisted               | document signing mode + unlock logic |
+| CC recipients              | Explicit role model                    | informational notification templates |
+| Resend link                | SigningRequest distinct from Recipient | revoke/reissue endpoint              |
+| Expiration                 | `expiresAt` exists                     | expiration worker/sweep              |
+| Decline                    | Audit/event vocabulary exists          | public decline endpoint/reason       |
+| Recipient replacement      | Draft-only mutation rule               | revoke/reissue workflow              |
+| Live activity              | Audit timeline                         | SSE relay                            |
+| Concurrent editor changes  | Full replace deferred                  | revision/If-Match strategy           |
 
 ---
 

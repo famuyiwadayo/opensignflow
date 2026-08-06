@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -26,9 +25,10 @@ import {
   ApiCreatedDataResponse,
   ApiOkDataResponse,
   CurrentUser,
+  ValidatedBody,
   type AuthenticatedUser,
 } from '@/common';
-import type { CreateRecipientDto, UpdateRecipientDto } from './dto';
+import { CreateRecipientDto, UpdateRecipientDto } from './dto';
 import { RecipientEntity } from './entities';
 import { RecipientsService } from './recipients.service';
 
@@ -60,7 +60,7 @@ export class RecipientsController {
     @CurrentUser() user: AuthenticatedUser,
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
-    @Body() dto: CreateRecipientDto,
+    @ValidatedBody(CreateRecipientDto) dto: CreateRecipientDto,
     @Req() request: Request,
   ) {
     return {
@@ -82,7 +82,7 @@ export class RecipientsController {
     @Headers('x-organization-id') organizationId: string | undefined,
     @Param('documentId') documentId: string,
     @Param('recipientId') recipientId: string,
-    @Body() dto: UpdateRecipientDto,
+    @ValidatedBody(UpdateRecipientDto) dto: UpdateRecipientDto,
     @Req() request: Request,
   ) {
     return {

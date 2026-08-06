@@ -1,8 +1,12 @@
-import type { ArgumentsHost, ExceptionFilter} from '@nestjs/common';
+import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Catch, HttpException, HttpStatus } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
-import { ErrorCode, type ApiErrorDetail, type ErrorCode as ErrorCodeType } from '../errors';
+import {
+  ErrorCode,
+  type ApiErrorDetail,
+  type ErrorCode as ErrorCodeType,
+} from '../errors';
 
 type RequestWithRequestId = Request & {
   requestId?: string;
@@ -22,9 +26,16 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<RequestWithRequestId>();
 
-    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : undefined;
-    const normalized = this.normalizeExceptionResponse(status, exceptionResponse);
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse =
+      exception instanceof HttpException ? exception.getResponse() : undefined;
+    const normalized = this.normalizeExceptionResponse(
+      status,
+      exceptionResponse,
+    );
 
     response.status(status).json({
       error: {
@@ -38,7 +49,10 @@ export class ApiExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private normalizeExceptionResponse(status: number, exceptionResponse: unknown) {
+  private normalizeExceptionResponse(
+    status: number,
+    exceptionResponse: unknown,
+  ) {
     const fallback = this.defaultCodeAndMessage(status);
 
     if (typeof exceptionResponse === 'string') {
@@ -67,30 +81,66 @@ export class ApiExceptionFilter implements ExceptionFilter {
     };
   }
 
-  private defaultCodeAndMessage(status: number): { code: ErrorCodeType; message: string } {
+  private defaultCodeAndMessage(status: number): {
+    code: ErrorCodeType;
+    message: string;
+  } {
     switch (status) {
       case HttpStatus.BAD_REQUEST:
-        return { code: ErrorCode.BAD_REQUEST, message: 'The request is invalid.' };
+        return {
+          code: ErrorCode.BAD_REQUEST,
+          message: 'The request is invalid.',
+        };
       case HttpStatus.UNAUTHORIZED:
-        return { code: ErrorCode.UNAUTHORIZED, message: 'Authentication is required.' };
+        return {
+          code: ErrorCode.UNAUTHORIZED,
+          message: 'Authentication is required.',
+        };
       case HttpStatus.FORBIDDEN:
-        return { code: ErrorCode.FORBIDDEN, message: 'You do not have permission to perform this action.' };
+        return {
+          code: ErrorCode.FORBIDDEN,
+          message: 'You do not have permission to perform this action.',
+        };
       case HttpStatus.NOT_FOUND:
-        return { code: ErrorCode.RESOURCE_NOT_FOUND, message: 'Resource was not found.' };
+        return {
+          code: ErrorCode.RESOURCE_NOT_FOUND,
+          message: 'Resource was not found.',
+        };
       case HttpStatus.CONFLICT:
-        return { code: ErrorCode.CONFLICT, message: 'The request conflicts with the current resource state.' };
+        return {
+          code: ErrorCode.CONFLICT,
+          message: 'The request conflicts with the current resource state.',
+        };
       case HttpStatus.PAYLOAD_TOO_LARGE:
-        return { code: ErrorCode.FILE_TOO_LARGE, message: 'Uploaded file is too large.' };
+        return {
+          code: ErrorCode.FILE_TOO_LARGE,
+          message: 'Uploaded file is too large.',
+        };
       case HttpStatus.UNSUPPORTED_MEDIA_TYPE:
-        return { code: ErrorCode.UNSUPPORTED_FILE_TYPE, message: 'Unsupported media type.' };
+        return {
+          code: ErrorCode.UNSUPPORTED_FILE_TYPE,
+          message: 'Unsupported media type.',
+        };
       case HttpStatus.UNPROCESSABLE_ENTITY:
-        return { code: ErrorCode.VALIDATION_ERROR, message: 'One or more fields are invalid.' };
+        return {
+          code: ErrorCode.VALIDATION_ERROR,
+          message: 'One or more fields are invalid.',
+        };
       case HttpStatus.TOO_MANY_REQUESTS:
-        return { code: ErrorCode.RATE_LIMITED, message: 'Too many requests. Please try again later.' };
+        return {
+          code: ErrorCode.RATE_LIMITED,
+          message: 'Too many requests. Please try again later.',
+        };
       case HttpStatus.SERVICE_UNAVAILABLE:
-        return { code: ErrorCode.SERVICE_UNAVAILABLE, message: 'Service is temporarily unavailable.' };
+        return {
+          code: ErrorCode.SERVICE_UNAVAILABLE,
+          message: 'Service is temporarily unavailable.',
+        };
       default:
-        return { code: ErrorCode.INTERNAL_SERVER_ERROR, message: 'An unexpected error occurred.' };
+        return {
+          code: ErrorCode.INTERNAL_SERVER_ERROR,
+          message: 'An unexpected error occurred.',
+        };
     }
   }
 }

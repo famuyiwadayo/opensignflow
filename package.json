@@ -24,8 +24,8 @@
     "lint:fix": "turbo lint:fix",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "clean": "turbo clean && rm -rf node_modules",
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
@@ -33,20 +33,29 @@
     "db:deploy": "turbo db:deploy",
     "db:reset": "turbo db:reset",
     "db:migrate:create": "turbo db:migrate:create --",
-    "db:status": "turbo db:status",
-    "db:push": "turbo db:push",
+    "db:status": "turbo db:status --filter=@opensignflow/database",
+    "db:push": "turbo db:push --filter=@opensignflow/database",
+    "dev:worker": "turbo dev --filter=@opensignflow/worker",
+    "start:worker": "turbo start --filter=@opensignflow/worker",
     "generate": "bun run db:generate",
     "check": "bun run generate && bun run lint && bun run typecheck",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.7.0",
     "globals": "^17.8.0",
     "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "turbo": "^2.10.6",
-    "typescript": "5.9.3",
+    "typescript": "^6",
     "typescript-eslint": "^8.65.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
   }
 }

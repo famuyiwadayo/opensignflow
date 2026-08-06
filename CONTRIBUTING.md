@@ -51,16 +51,16 @@ A Husky pre-push hook runs `bun run check` automatically. Do not bypass it with 
 
 ## Read these documents first
 
-| Topic | Required reference |
-|---|---|
-| Repository and package boundaries | [Architecture](docs/architecture.md) |
-| Backend module, DTO, entity, and repository conventions | [Backend Standards](docs/backend-standards.md) |
-| API response and error contract | [REST API Contract](docs/rest-api-contract.md) and [Error Codes](docs/error-codes.md) |
-| Prisma schema, migrations, and generated client | [Database Workflow](docs/database-workflow.md) |
-| Root environment and Redis readiness | [Configuration and Dependency Readiness](docs/configuration-and-dependency-readiness.md) |
-| Recipients, fields, and signing workflow | [Recipient, Field, and Signing Workflow](docs/recipient-field-and-signing-workflow.md) |
-| Signing token, delivery, and public signing security | [Signing, Delivery, and Token-Security Architecture](docs/signing-delivery-architecture.md) |
-| Transactional outbox and worker dispatch | [Transactional Outbox Pattern](docs/transactional-outbox.md) |
+| Topic                                                   | Required reference                                                                          |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Repository and package boundaries                       | [Architecture](docs/architecture.md)                                                        |
+| Backend module, DTO, entity, and repository conventions | [Backend Standards](docs/backend-standards.md)                                              |
+| API response and error contract                         | [REST API Contract](docs/rest-api-contract.md) and [Error Codes](docs/error-codes.md)       |
+| Prisma schema, migrations, and generated client         | [Database Workflow](docs/database-workflow.md)                                              |
+| Root environment and Redis readiness                    | [Configuration and Dependency Readiness](docs/configuration-and-dependency-readiness.md)    |
+| Recipients, fields, and signing workflow                | [Recipient, Field, and Signing Workflow](docs/recipient-field-and-signing-workflow.md)      |
+| Signing token, delivery, and public signing security    | [Signing, Delivery, and Token-Security Architecture](docs/signing-delivery-architecture.md) |
+| Transactional outbox and worker dispatch                | [Transactional Outbox Pattern](docs/transactional-outbox.md)                                |
 
 ## Architectural boundaries
 

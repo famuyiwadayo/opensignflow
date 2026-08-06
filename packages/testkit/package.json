@@ -1,50 +1,50 @@
 {
-    "name": "@opensignflow/testkit",
-    "version": "0.0.0",
-    "private": true,
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "default": "./dist/index.js"
-        }
-    },
-    "scripts": {
-        "build": "tsc -p tsconfig.json",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "typecheck": "tsc -p tsconfig.json --noEmit",
-        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
-        "clean": "rm -rf dist"
-    },
-    "dependencies": {
-        "@opensignflow/database": "workspace:*",
-        "@opensignflow/shared": "workspace:*",
-        "@opensignflow/config": "workspace:*",
-        "@testcontainers/postgresql": "^12.0.4",
-        "testcontainers": "^12.0.4"
-    },
-    "devDependencies": {
-        "@types/jest": "^30.0.0",
-        "@types/node": "^26.1.2",
-        "cross-env": "^10.1.0",
-        "jest": "^30.4.2",
-        "ts-jest": "^29.4.12",
-        "typescript": "^6.0.0"
-    },
-    "jest": {
-        "moduleFileExtensions": [
-            "js",
-            "json",
-            "ts"
-        ],
-        "rootDir": "src",
-        "testRegex": ".*\\.spec\\.ts$",
-        "transform": {
-            "^.+\\.(t|j)s$": "ts-jest"
-        },
-        "testEnvironment": "node",
-        "testTimeout": 120000
+  "name": "@opensignflow/testkit",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@opensignflow/database": "workspace:*",
+    "@opensignflow/shared": "workspace:*",
+    "@opensignflow/config": "workspace:*",
+    "@testcontainers/postgresql": "^12.0.4",
+    "testcontainers": "^12.0.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.1.2",
+    "cross-env": "^10.1.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12",
+    "typescript": "^6.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testTimeout": 120000
+  }
 }

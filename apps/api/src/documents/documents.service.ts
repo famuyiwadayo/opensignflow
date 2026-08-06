@@ -208,6 +208,7 @@ export class DocumentsService {
     organizationId?: string;
     documentId: string;
     variant: 'original' | 'completed';
+    disposition: 'attachment' | 'inline';
   }): Promise<DocumentDownloadUrlEntity> {
     const membership =
       await this.organizationsService.resolveActiveMembershipForUser({
@@ -244,7 +245,10 @@ export class DocumentsService {
     ).toISOString();
     const url = await this.storageService.createSignedDownloadUrl({
       key,
-      fileName: document.originalFileName,
+      fileName:
+        input.disposition === 'attachment'
+          ? document.originalFileName
+          : undefined,
       contentType: document.mimeType,
       expiresInSeconds,
     });

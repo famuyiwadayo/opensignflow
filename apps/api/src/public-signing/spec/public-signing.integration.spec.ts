@@ -72,6 +72,7 @@ describe('PublicSigningService integration', () => {
             ? Buffer.alloc(32, 5).toString('base64')
             : 'test-v1',
       } as never,
+      { createSignedDownloadUrl: jest.fn() } as never,
     );
 
     const view = await service.getByToken(token, {});
@@ -149,6 +150,7 @@ describe('PublicSigningService integration', () => {
               ? Buffer.alloc(32, 5).toString('base64')
               : 'test-v1',
         } as never,
+        { createSignedDownloadUrl: jest.fn() } as never,
       );
 
       await expect(service.getByToken(token, {})).rejects.toMatchObject({
@@ -194,6 +196,7 @@ describe('PublicSigningService integration', () => {
             ? Buffer.alloc(32, 5).toString('base64')
             : 'test-v1',
       } as never,
+      { createSignedDownloadUrl: jest.fn() } as never,
     );
 
     await service.submit(
@@ -255,6 +258,56 @@ describe('PublicSigningService integration', () => {
     expect(envelope.payload.jobId).toBe(jobs[0].id);
   });
 
+  it('rejects submission when required recipient fields are missing', async () => {
+    const workflow = await createDocumentWorkflow({
+      database,
+      signerCount: 1,
+      fieldsPerSigner: 2,
+    });
+    const token = 'required-token';
+    await database.signingRequest.create({
+      data: {
+        id: 'sreq_required',
+        documentId: workflow.document.id,
+        recipientId: workflow.signers[0].id,
+        tokenHash: createHash('sha256').update(token).digest('hex'),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    const service = new PublicSigningService(
+      database as never,
+      { record: jest.fn() } as never,
+      new IdGeneratorService(),
+      {
+        getOrThrow: (name: string) =>
+          name === 'OUTBOX_ENCRYPTION_KEY'
+            ? Buffer.alloc(32, 5).toString('base64')
+            : 'test-v1',
+      } as never,
+      { createSignedDownloadUrl: jest.fn() } as never,
+    );
+
+    await expect(
+      service.submit(
+        token,
+        {
+          values: [
+            {
+              fieldId: workflow.fields[0].id,
+              value: { type: 'TYPED_NAME', name: 'Grace Hopper' },
+            },
+          ],
+        },
+        {},
+      ),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        code: 'SIGNING_REQUIRED_FIELDS_MISSING',
+      }),
+    });
+    expect(await database.signingSubmission.count()).toBe(0);
+  });
+
   it('rejects submission of a field owned by another signer', async () => {
     const workflow = await createDocumentWorkflow({
       database,
@@ -281,6 +334,7 @@ describe('PublicSigningService integration', () => {
             ? Buffer.alloc(32, 5).toString('base64')
             : 'test-v1',
       } as never,
+      { createSignedDownloadUrl: jest.fn() } as never,
     );
 
     await expect(

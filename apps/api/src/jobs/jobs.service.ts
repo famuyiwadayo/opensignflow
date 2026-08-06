@@ -31,4 +31,24 @@ export class JobsService {
     }
     return JobEntity.fromPrisma(job);
   }
+
+  async listForDocument(input: {
+    user: AuthenticatedUser;
+    organizationId?: string;
+    documentId: string;
+  }) {
+    const membership = await this.organizations.resolveActiveMembershipForUser({
+      userId: input.user.id,
+      organizationId: input.organizationId,
+    });
+    const jobs = await this.prisma.jobRecord.findMany({
+      where: {
+        organizationId: membership.organization.id,
+        resourceType: 'DOCUMENT',
+        resourceId: input.documentId,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return jobs.map(JobEntity.fromPrisma);
+  }
 }
