@@ -7,11 +7,15 @@ type EditorState = {
   currentPage: number;
   zoom: number;
   uploadProgress: number;
+  activeFieldType: 'SIGNATURE' | 'INITIALS' | 'TEXT' | 'DATE' | 'CHECKBOX';
+  isPlacingField: boolean;
   setSelectedRecipient(id: string | null): void;
   setSelectedFields(ids: string[]): void;
   setPage(page: number): void;
   setZoom(zoom: number): void;
   setUploadProgress(percent: number): void;
+  setActiveFieldType(type: EditorState['activeFieldType']): void;
+  setPlacingField(value: boolean): void;
   reset(): void;
 };
 
@@ -21,11 +25,15 @@ export const useDocumentEditorStore = create<EditorState>((set) => ({
   currentPage: 1,
   zoom: 1,
   uploadProgress: 0,
+  activeFieldType: 'SIGNATURE',
+  isPlacingField: false,
   setSelectedRecipient: (selectedRecipientId) => set({ selectedRecipientId }),
   setSelectedFields: (selectedFieldIds) => set({ selectedFieldIds }),
   setPage: (currentPage) => set({ currentPage }),
   setZoom: (zoom) => set({ zoom }),
   setUploadProgress: (uploadProgress) => set({ uploadProgress }),
+  setActiveFieldType: (activeFieldType) => set({ activeFieldType }),
+  setPlacingField: (isPlacingField) => set({ isPlacingField }),
   reset: () =>
     set({
       selectedRecipientId: null,
@@ -33,5 +41,7 @@ export const useDocumentEditorStore = create<EditorState>((set) => ({
       currentPage: 1,
       zoom: 1,
       uploadProgress: 0,
+      activeFieldType: 'SIGNATURE',
+      isPlacingField: false,
     }),
 }));

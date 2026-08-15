@@ -128,6 +128,54 @@ export class PublicSigningService {
     };
   }
 
+  async getDocumentPreview(token: string) {
+    const request = await this.prisma.signingRequest.findUnique({
+      where: { tokenHash: this.hash(token) },
+      include: { document: true },
+    });
+
+    if (!request) {
+      throw new NotFoundException(
+        apiError(
+          ErrorCode.SIGNING_REQUEST_NOT_FOUND,
+          'Signing request was not found.',
+        ),
+      );
+    }
+
+    if (request.status === SigningRequestStatus.REVOKED) {
+      throw new UnauthorizedException(
+        apiError(
+          ErrorCode.SIGNING_REQUEST_REVOKED,
+          'Signing request is no longer active.',
+        ),
+      );
+    }
+
+    if (request.expiresAt <= new Date()) {
+      throw new UnauthorizedException(
+        apiError(ErrorCode.SIGNING_TOKEN_EXPIRED, 'Signing link has expired.'),
+      );
+    }
+
+    if (request.status === SigningRequestStatus.COMPLETED) {
+      throw new UnauthorizedException(
+        apiError(
+          ErrorCode.SIGNING_ALREADY_SUBMITTED,
+          'Signing request has already been completed.',
+        ),
+      );
+    }
+
+    return {
+      bytes: await this.storage.getObjectBytes(
+        request.document.originalStorageKey,
+      ),
+      mimeType: request.document.mimeType,
+      fileName: request.document.originalFileName,
+    };
+  }
+
   async createDocumentUrl(token: string) {
     const request = await this.prisma.signingRequest.findUnique({
       where: { tokenHash: this.hash(token) },
