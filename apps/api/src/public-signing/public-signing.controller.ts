@@ -1,15 +1,17 @@
 import {
   Controller,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Inject,
   Param,
   Post,
   Req,
+  Res,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { ApiOkDataResponse, ValidatedBody } from '../common';
 import { SubmitSigningRequestDto } from './dto';
 import { PublicSigningRequestEntity } from './entities/signing-request.entity';
@@ -38,7 +40,20 @@ export class PublicSigningController {
     };
   }
 
+  @Get(':token/preview')
+  @Header('Cache-Control', 'private, no-store')
+  async preview(@Param('token') token: string, @Res() response: Response) {
+    const document = await this.signing.getDocumentPreview(token);
+    response.setHeader('Content-Type', document.mimeType);
+    response.setHeader(
+      'Content-Disposition',
+      `inline; filename="${document.fileName.replace(/["\\\r\n]/g, '_')}"`,
+    );
+    response.send(Buffer.from(document.bytes));
+  }
+
   @Get(':token/document-url')
+  @Header('Cache-Control', 'no-store, private')
   async documentUrl(@Param('token') token: string) {
     return { data: await this.signing.createDocumentUrl(token) };
   }

@@ -6,10 +6,11 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
-    "lint": "eslint .",
+    "lint": "eslint . --ignore-pattern .next --ignore-pattern next-env.d.ts --ignore-pattern public/pdf.worker.min.mjs",
     "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",
     "test": "echo 'No tests yet for @opensignflow/web'",
-    "clean": "rm -rf .next out coverage"
+    "clean": "rm -rf .next out coverage",
+    "copy:pdf-worker": "node ../../scripts/copy-pdf-worker.mjs"
   },
   "dependencies": {
     "@opensignflow/config": "workspace:*",

@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Controller,
   Get,
+  Header,
   Headers,
   Inject,
   Param,
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -20,7 +22,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { memoryStorage } from 'multer';
 
 import { ListAuditEventsQueryDto } from '@/audit';
@@ -40,6 +42,7 @@ import { CreateDocumentDto } from './dto';
 import { DocumentDownloadUrlEntity, DocumentEntity } from './entities';
 import { DocumentsService } from './documents.service';
 import type { UploadedPdfFile } from './documents.service';
+import { StorageService } from '@/storage';
 
 @ApiTags('documents')
 @ApiBearerAuth()
@@ -49,6 +52,8 @@ export class DocumentsController {
   constructor(
     @Inject(DocumentsService)
     private readonly documentsService: DocumentsService,
+    @Inject(StorageService)
+    private readonly storage: StorageService,
   ) {}
 
   @Get()
@@ -124,6 +129,28 @@ export class DocumentsController {
     });
   }
 
+  @Get(':documentId/preview')
+  @Header('Cache-Control', 'private, no-store')
+  async previewOriginal(
+    @CurrentUser() user: AuthenticatedUser,
+    @Headers('x-organization-id') organizationId: string | undefined,
+    @Param('documentId') documentId: string,
+    @Res() response: Response,
+  ) {
+    const document = await this.documentsService.getOriginalForPreview({
+      user,
+      organizationId,
+      documentId,
+    });
+    const bytes = await this.storage.getObjectBytes(document.key);
+    response.setHeader('Content-Type', document.mimeType);
+    response.setHeader(
+      'Content-Disposition',
+      `inline; filename="${document.fileName.replace(/["\\\r\n]/g, '_')}"`,
+    );
+    response.send(Buffer.from(bytes));
+  }
+
   @Get(':documentId')
   @ApiOperation({ summary: 'Get document details' })
   @ApiOkDataResponse(DocumentEntity)
@@ -142,6 +169,7 @@ export class DocumentsController {
   }
 
   @Get(':documentId/download-url')
+  @Header('Cache-Control', 'no-store, private')
   @ApiOperation({
     summary: 'Create a short-lived signed document download URL',
   })

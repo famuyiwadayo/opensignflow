@@ -16,6 +16,8 @@ export default [
       '**/.turbo/**',
       '**/target/**',
 
+      '**/pdf.worker.min.mjs',
+
       // Generated source is typechecked, but not handwritten code.
       'packages/database/src/generated/**',
 
@@ -30,6 +32,14 @@ export default [
 
   // TypeScript parser/plugin/recommended rules.
   ...tseslint.configs.recommended,
+
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: { ...globals.node, ...globals.es2024 },
+      sourceType: 'module',
+    },
+  },
 
   // Shared TypeScript rules for handwritten code.
   {

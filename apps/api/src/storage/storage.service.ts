@@ -65,6 +65,27 @@ export class StorageService {
       );
     }
   }
+
+  async getObjectBytes(key: string): Promise<Uint8Array> {
+    try {
+      return await this.storage.getBytes(key);
+    } catch (error) {
+      throw new ServiceUnavailableException(
+        apiError(
+          ErrorCode.STORAGE_DOWNLOAD_URL_FAILED,
+          'Document could not be loaded from storage.',
+          [
+            {
+              issue:
+                error instanceof Error
+                  ? error.message
+                  : 'Unknown storage error.',
+            },
+          ],
+        ),
+      );
+    }
+  }
 }
 function required(config: ConfigService, key: string) {
   const value = config.get<string>(key);

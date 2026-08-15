@@ -203,6 +203,33 @@ export class DocumentsService {
     return DocumentEntity.fromPrisma(document);
   }
 
+  async getOriginalForPreview(input: {
+    user: AuthenticatedUser;
+    organizationId?: string;
+    documentId: string;
+  }) {
+    const membership =
+      await this.organizationsService.resolveActiveMembershipForUser({
+        userId: input.user.id,
+        organizationId: input.organizationId,
+      });
+    const document =
+      await this.documentsRepository.findStorageByIdForOrganization({
+        documentId: input.documentId,
+        organizationId: membership.organization.id,
+      });
+    if (!document) {
+      throw new NotFoundException(
+        apiError(ErrorCode.DOCUMENT_NOT_FOUND, 'Document was not found.'),
+      );
+    }
+    return {
+      key: document.originalStorageKey,
+      mimeType: document.mimeType,
+      fileName: document.originalFileName,
+    };
+  }
+
   async createDownloadUrl(input: {
     user: AuthenticatedUser;
     organizationId?: string;
